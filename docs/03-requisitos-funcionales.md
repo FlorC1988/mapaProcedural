@@ -7,13 +7,13 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 ## Generación
 
 - **RF-GEN-001 — Aprobado:** el usuario podrá configurar la cantidad de filas y columnas.
-- **RF-GEN-002 — Aprobado:** el usuario podrá indicar cuántos microbiomas desea incluir.
+- **RF-GEN-002 — Aprobado:** el usuario podrá indicar cuántos microbiomas desea incluir y elegir qué definiciones activas participan en el reparto (`DEC-091`).
 - **RF-GEN-003 — Aprobado:** el usuario indicará una cantidad común `N` de gimnasios por cuadrante, con valor predeterminado 2, y un radio global de influencia para la generación.
 - **RF-GEN-004 — Aprobado:** el sistema generará una configuración que satisfaga todas las restricciones obligatorias.
 - **RF-GEN-005 — Aprobado:** todas las posiciones estarán ocupadas al terminar una generación correcta.
 - **RF-GEN-006 — Aprobado:** si no puede colocar la cantidad solicitada de microbiomas o gimnasios, la generación fallará sin reducirla automáticamente.
 - **RF-GEN-007 — Aprobado:** el resultado puede ser cualquier solución válida; no se exige calidad estética, variedad ni equilibrio.
-- **RF-GEN-008 — Aprobado:** filas y columnas serán valores pares independientes entre 8 y 30, predeterminados en 16×16; microbiomas será 0..10, predeterminado en 2; `N` será 1..4, predeterminado en 2; radio será 0..2, predeterminado en 1.
+- **RF-GEN-008 — Aprobado:** filas y columnas serán valores pares independientes entre 8 y 30, predeterminados en 16×16; microbiomas será 0..10, predeterminado en 2, repartidos entre las definiciones elegidas por el usuario; `N` será 1..4, predeterminado en 2; radio será 0..2, predeterminado en 1.
 - **RF-GEN-009 — Aprobado:** la semilla será visible y editable; si el usuario no introduce una, el sistema la generará, mostrará y conservará con el mapa. Con la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo, el resultado será idéntico.
 - **RF-GEN-010 — Aprobado:** el tablero se dividirá en cuatro cuadrantes iguales y requerirá cantidades pares de filas y columnas.
 - **RF-GEN-011 — Aprobado:** el sistema seleccionará aleatoriamente `4 × N` tipos distintos del catálogo fijo de 18; por ello `N ≤ 4`.

@@ -4,7 +4,7 @@
 
 - filas pares entre 8 y 30, predeterminadas en 16;
 - columnas pares entre 8 y 30, predeterminadas en 16;
-- microbiomas entre 0 y 10, predeterminados en 2;
+- cantidad de microbiomas entre 0 y 10, predeterminada en 2, y las definiciones activas elegidas para el reparto (predeterminado: todas);
 - `N` gimnasios por cuadrante entre 1 y 4, predeterminado en 2;
 - radio global entre 0 y 2, predeterminado en 1;
 - semilla visible y editable.
@@ -23,12 +23,13 @@ El resultado correcto no contiene posiciones vacías y satisface todas las condi
 
 ## 3. Selección de microbiomas
 
-1. Solo participan microbiomas activos.
-2. El usuario indica la cantidad, no los tipos ni las ubicaciones.
-3. Todos los microbiomas activos deben utilizarse al menos una vez antes de repetir cualquiera.
-4. Si la cantidad solicitada no supera la cantidad activa, se seleccionan tipos distintos.
-5. Si la supera, se utilizan primero todos al menos una vez y los restantes se eligen aleatoriamente entre los activos.
-6. Todos tienen igual probabilidad; no existe ponderación configurable en esta versión.
+1. Solo participan definiciones activas y elegidas por el usuario (`DEC-091`).
+2. El usuario indica la cantidad total y el conjunto de definiciones participantes, no las ubicaciones.
+3. Todas las definiciones elegidas deben utilizarse al menos una vez antes de repetir cualquiera.
+4. Si la cantidad solicitada no supera la cantidad elegida, se seleccionan tipos distintos entre las elegidas.
+5. Si la supera, se utilizan primero todas las elegidas al menos una vez y los restantes se eligen aleatoriamente entre ellas.
+6. Todas tienen igual probabilidad; no existe ponderación configurable en esta versión.
+7. La selección forma parte de la configuración conservada; en snapshots anteriores a `DEC-091`, sin selección registrada, el conjunto equivale a todas las definiciones activas.
 
 ## 4. Colocación de microbiomas
 

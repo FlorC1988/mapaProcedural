@@ -40,6 +40,9 @@ export interface ConfigGeneracion {
   filas: number;
   columnas: number;
   microbiomas: number;
+  // Definiciones elegidas por el usuario; ausente en snapshots anteriores
+  // a DEC-091 (equivale a "todas las activas").
+  microbiomasElegidos?: string[];
   n: number;
   radio: number;
   semilla: string;

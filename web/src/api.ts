@@ -28,6 +28,7 @@ export interface ConfigGeneracion {
   filas: number;
   columnas: number;
   microbiomas: number;
+  microbiomasElegidos?: string[];
   n: number;
   radio: number;
   semilla?: string;
@@ -43,7 +44,7 @@ export interface CeldaMapa {
 }
 
 export interface MapaGenerado {
-  configuracion: { filas: number; columnas: number; microbiomas: number; n: number; radio: number; semilla: string };
+  configuracion: { filas: number; columnas: number; microbiomas: number; microbiomasElegidos?: string[]; n: number; radio: number; semilla: string };
   celdas: CeldaMapa[];
   gimnasios: {
     id: string;

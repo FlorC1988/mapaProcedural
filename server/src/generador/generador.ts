@@ -394,7 +394,11 @@ function* buscar(
   gimnasios: InstanciaGimnasio[]
 ): Generator<void> {
   const defs = seleccionarMicrobiomas(
-    ctx.microbiomas.filter((m) => m.activo),
+    ctx.microbiomas.filter(
+      (m) =>
+        m.activo &&
+        (config.microbiomasElegidos === undefined || config.microbiomasElegidos.includes(m.id))
+    ),
     config.microbiomas,
     rnd
   );

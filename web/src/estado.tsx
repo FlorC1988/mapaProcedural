@@ -9,6 +9,8 @@ interface ConfigForm {
   filas: number;
   columnas: number;
   microbiomas: number;
+  // null = el usuario todavía no eligió (el modal marca todas por defecto).
+  microbiomasElegidos: string[] | null;
   gimnasiosPorCuadrante: number;
   radio: number;
   semilla: string;
@@ -18,6 +20,7 @@ export const CONFIG_INICIAL: ConfigForm = {
   filas: 16,
   columnas: 16,
   microbiomas: 2,
+  microbiomasElegidos: null,
   gimnasiosPorCuadrante: 2,
   radio: 1,
   semilla: "",

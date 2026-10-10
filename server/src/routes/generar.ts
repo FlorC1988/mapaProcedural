@@ -31,6 +31,21 @@ generarRouter.post("/generar", async (req, res, next) => {
     if (cuerpo.semilla !== undefined && typeof cuerpo.semilla !== "string") {
       errores.semilla = "Debe ser texto.";
     }
+    const elegidos = cuerpo.microbiomasElegidos;
+    if (
+      elegidos !== undefined &&
+      (!Array.isArray(elegidos) || elegidos.some((id) => typeof id !== "string"))
+    ) {
+      errores.microbiomasElegidos = "Debe ser una lista de identificadores.";
+    }
+    if (
+      Array.isArray(elegidos) &&
+      Number.isInteger(cuerpo.microbiomas) &&
+      cuerpo.microbiomas > 0 &&
+      elegidos.length === 0
+    ) {
+      errores.microbiomasElegidos = "Elegí al menos una definición para colocar microbiomas.";
+    }
     if (Object.keys(errores).length > 0) {
       res.status(400).json({
         error: "parametros_invalidos",
@@ -44,11 +59,24 @@ generarRouter.post("/generar", async (req, res, next) => {
     const inicio = process.hrtime.bigint();
     const ctxSnap = await cargarContextoSnapshot();
     const ctx = snapshotAContexto(ctxSnap);
+    if (Array.isArray(elegidos)) {
+      const activas = new Set(ctx.microbiomas.filter((m) => m.activo).map((m) => m.id));
+      const desconocidas = (elegidos as string[]).filter((id) => !activas.has(id));
+      if (desconocidas.length > 0) {
+        res.status(400).json({
+          error: "parametros_invalidos",
+          causa: "Hay definiciones de microbioma elegidas que no existen o están inactivas.",
+          accion: "Actualizá la selección de microbiomas.",
+        });
+        return;
+      }
+    }
     const { resultado, semilla } = generar(
       {
         filas: cuerpo.filas,
         columnas: cuerpo.columnas,
         microbiomas: cuerpo.microbiomas,
+        microbiomasElegidos: Array.isArray(elegidos) ? elegidos : undefined,
         n: cuerpo.n,
         radio: cuerpo.radio,
         semilla: cuerpo.semilla,

@@ -70,7 +70,7 @@
 - **RD-MIC-006:** dos microbiomas no pueden ser adyacentes.
 - **RD-MIC-007:** un microbioma no puede salir del tablero ni superponerse con otro.
 - **RD-MIC-008:** su colocación no puede impedir una configuración válida del resto del mapa.
-- **RD-MIC-009:** el usuario solicita entre 0 y 10 microbiomas, con valor predeterminado 2.
+- **RD-MIC-009:** el usuario solicita entre 0 y 10 microbiomas, con valor predeterminado 2, y elige qué definiciones activas participan en el reparto (predeterminado: todas); si la cantidad es mayor que cero, al menos una definición debe estar elegida.
 - **RD-MIC-010:** en edición manual, estampar una definición activa crea una instancia completa sin rotación ni reflexión, reemplaza bioma y altura, conserva gimnasios y desvincula por completo cualquier instancia intersectada.
 - **RD-MIC-011:** mover una instancia desvincula primero su ubicación anterior conservando los valores de sus celdas y luego aplica el estampado en la nueva ancla.
 - **RD-MIC-012:** una definición guardada contiene entre 1 y 900 celdas con coordenadas axiales relativas únicas, incluye el ancla `(0,0)` y no supera una extensión equivalente a 30×30 posiciones visibles para ninguna de las dos paridades posibles de la columna del ancla.

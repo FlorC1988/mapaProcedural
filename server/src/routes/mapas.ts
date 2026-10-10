@@ -169,7 +169,7 @@ mapas.post("/mapas/:id/regenerar", async (req, res, next) => {
       return;
     }
     const snapshot = rows[0].snapshot as {
-      configuracion: Record<string, number>;
+      configuracion: Record<string, number | string[] | undefined>;
       contexto: ContextoSnapshot;
     };
     const ctx = snapshotAContexto(snapshot.contexto);
@@ -177,6 +177,7 @@ mapas.post("/mapas/:id/regenerar", async (req, res, next) => {
       filas: number;
       columnas: number;
       microbiomas: number;
+      microbiomasElegidos?: string[];
       n: number;
       radio: number;
       semilla?: string;

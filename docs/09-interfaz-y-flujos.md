@@ -3,9 +3,9 @@
 ## 1. Flujo de generación aprobado
 
 1. El usuario accede a la configuración de generación.
-2. Configura filas y columnas pares `8..30` (default 16), microbiomas `0..10` (default 2), `N` `1..4` (default 2), radio `0..2` (default 1) y, opcionalmente, una semilla visible y editable.
+2. Configura filas y columnas pares `8..30` (default 16), `N` `1..4` (default 2), radio `0..2` (default 1) y, opcionalmente, una semilla visible y editable.
 3. La interfaz valida los rangos; si existe un error, muestra su causa e impide generar.
-4. Con parámetros válidos, solicita generar.
+4. Al solicitar generar, un diálogo modal lista las definiciones activas de microbioma para que el usuario elija cuáles participan (predeterminado: todas) e indique la cantidad total a colocar `0..10` (default 2); confirmar inicia la generación.
 5. Si la semilla está vacía, el sistema genera una y la muestra antes de iniciar la búsqueda.
 6. El sistema intenta producir cualquier solución válida.
 7. Si tiene éxito, muestra el tablero, la matriz de recursos y la semilla utilizada.

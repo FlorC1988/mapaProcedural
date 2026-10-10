@@ -48,9 +48,9 @@ Trazabilidad: RD-MIC-006, RD-MIC-007.
 
 ### CA-GEN-006 — Selección antes de repetición
 
-Dados microbiomas activos y una cantidad solicitada, ningún tipo se repite hasta haber seleccionado una vez todos los tipos activos, salvo que la cantidad solicitada sea menor que su número.
+Dado el conjunto de definiciones elegidas por el usuario y una cantidad solicitada, ningún tipo se repite hasta haber seleccionado una vez todas las definiciones elegidas, salvo que la cantidad solicitada sea menor que su número.
 
-Trazabilidad: sección 3 de `06-generacion-de-mapas.md`.
+Trazabilidad: sección 3 de `06-generacion-de-mapas.md`, DEC-091.
 
 ### CA-GEN-007 — Gimnasios por cuadrante
 
@@ -90,7 +90,7 @@ Trazabilidad: RD-GIM-014, DEC-025.
 
 ### CA-GEN-015 — Parámetros y valores iniciales
 
-El formulario inicia en 16×16, 2 microbiomas, `N = 2` y radio 1; acepta dimensiones pares independientes `8..30`, microbiomas `0..10`, `N = 1..4` y radio `0..2`.
+El formulario inicia en 16×16, 2 microbiomas, `N = 2` y radio 1; acepta dimensiones pares independientes `8..30`, `N = 1..4` y radio `0..2`. Al solicitar generar, un diálogo permite elegir las definiciones de microbioma participantes (predeterminado: todas las activas) y la cantidad `0..10`.
 
 Trazabilidad: DEC-036, DEC-037, DEC-038, RF-GEN-008.
 
