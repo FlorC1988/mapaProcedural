@@ -3,18 +3,44 @@
 ## 1. Flujo de generación aprobado
 
 1. El usuario accede a la configuración de generación.
-2. Configura filas y columnas pares `8..30` (default 16), microbiomas `0..10` (default 2), `N` `1..4` (default 2) y radio `0..2` (default 1).
+2. Configura filas y columnas pares `8..30` (default 16), microbiomas `0..10` (default 2), `N` `1..4` (default 2), radio `0..2` (default 1) y, opcionalmente, una semilla visible y editable.
 3. La interfaz valida los rangos; si existe un error, muestra su causa e impide generar.
 4. Con parámetros válidos, solicita generar.
-5. El sistema intenta producir cualquier solución válida.
-6. Si tiene éxito, muestra el tablero y la matriz de recursos.
-7. Si la configuración válida es irresoluble, informa un fallo sin reducir microbiomas, `N` ni radio.
+5. Si la semilla está vacía, el sistema genera una y la muestra antes de iniciar la búsqueda.
+6. El sistema intenta producir cualquier solución válida.
+7. Si tiene éxito, muestra el tablero, la matriz de recursos y la semilla utilizada.
+8. Si agota el espacio sin solución, informa que no existe una solución para ese contexto sin reducir microbiomas, `N` ni radio.
+9. Si agota el presupuesto de nodos, informa que la búsqueda terminó sin demostrar que la configuración sea imposible.
+10. Si ocurre un error interno, lo informa separadamente.
+
+En cualquier terminación sin éxito, la interfaz no muestra ni ofrece guardar un mapa parcial.
 
 ## 2. Flujo de mapas guardados
 
-Está aprobado que el usuario pueda guardar y volver a abrir mapas. Cada mapa conserva la configuración completa usada para generarlo.
+Los mapas y catálogos son compartidos por todos los usuarios de una misma instalación.
 
-**Pendiente:** pantallas, búsqueda, orden, nombres, confirmaciones, eliminación, duplicación y sobrescritura.
+### 2.1. Primer guardado y actualización
+
+1. El primer Guardar solicita un nombre.
+2. La interfaz recorta los espacios exteriores y exige entre 1 y 100 caracteres.
+3. Si ya existe el nombre sin distinguir mayúsculas, rechaza la operación y solicita corregirlo; nunca sobrescribe por coincidencia de nombre.
+4. Si es único, crea una identidad con fechas y versión de concurrencia.
+5. Guardar nuevamente actualiza esa identidad si la versión abierta coincide con la persistida.
+6. Si otra persona la modificó, rechaza la actualización sin sobrescribir y ofrece recargar o utilizar Guardar como.
+
+### 2.2. Guardar como y duplicar
+
+Guardar como crea otra identidad a partir del estado actual y exige un nombre único distinto. Duplicar realiza la misma copia del estado actual y del contexto histórico, también con otra identidad, nombre, fechas y versión de concurrencia. Ninguna de las dos operaciones modifica el mapa de origen.
+
+### 2.3. Listado y reapertura
+
+El listado muestra nombre, creación y última modificación. Permite búsqueda parcial por nombre sin distinguir mayúsculas y orden por nombre, creación o modificación, ascendente o descendente. Inicialmente usa modificación descendente.
+
+Abrir recupera el estado guardado y su contexto histórico sin ejecutar validación. Los cambios posteriores de catálogos no alteran lo mostrado. Regenerar usa el snapshot del mapa.
+
+### 2.4. Eliminación
+
+Eliminar abre una confirmación simple que muestra el nombre y ofrece Cancelar o Eliminar. Confirmar elimina el mapa definitivamente.
 
 ## 3. Flujo de edición
 

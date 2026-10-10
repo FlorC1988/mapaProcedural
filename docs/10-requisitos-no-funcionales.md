@@ -11,7 +11,7 @@ No se han aprobado objetivos no funcionales concretos. Este documento enumera de
 - tamaños de tablero objetivo;
 - tiempo máximo de generación;
 - tiempo máximo de carga y guardado;
-- límite de búsqueda antes de informar fallo.
+- valor numérico del presupuesto global de nodos, que se fijará mediante benchmarks sobre los tamaños aprobados.
 
 ### Compatibilidad
 
@@ -30,7 +30,7 @@ No se han aprobado objetivos no funcionales concretos. Este documento enumera de
 
 - protección del área administrativa;
 - validación de entradas;
-- almacenamiento y despliegue;
+- producto de base relacional, credenciales, aislamiento de red y despliegue;
 - registro de acciones administrativas.
 
 ### Confiabilidad e integridad

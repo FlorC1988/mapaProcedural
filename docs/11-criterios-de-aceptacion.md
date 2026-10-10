@@ -112,6 +112,42 @@ Con parámetros válidos pero una configuración irresoluble, la generación fal
 
 Trazabilidad: DEC-039, RF-GEN-012.
 
+### CA-GEN-019 — Semilla automática
+
+Dada una configuración sin semilla introducida, cuando el usuario solicita generar, el sistema crea y muestra una semilla antes de iniciar la búsqueda y la conserva con el mapa si tiene éxito.
+
+Trazabilidad: DEC-042, RF-GEN-009.
+
+### CA-GEN-020 — Reproducibilidad
+
+Dadas la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo, dos generaciones recorren las mismas alternativas y terminan con el mismo resultado; si tienen éxito, producen exactamente el mismo mapa.
+
+Trazabilidad: DEC-042, RF-GEN-009, RD-REG-005, RD-REG-006.
+
+### CA-GEN-021 — Backtracking global
+
+Dada una decisión de una fase anterior que impide completar una fase posterior, mientras quede presupuesto y existan alternativas, la búsqueda puede deshacer esa decisión y probar otra respetando la secuencia aprobada.
+
+Trazabilidad: DEC-040, RF-GEN-014.
+
+### CA-GEN-022 — Presupuesto determinista
+
+Cada intento de asignar una alternativa en cualquier fase consume exactamente un nodo del presupuesto global; con contexto idéntico, la búsqueda alcanza los mismos estados y consume el mismo número de nodos.
+
+Trazabilidad: DEC-041, RF-GEN-015.
+
+### CA-GEN-023 — Resultados diferenciados
+
+Cuando la búsqueda agota todo el espacio, informa que no existe solución para ese contexto; cuando alcanza el presupuesto antes de agotarlo, informa presupuesto agotado sin afirmar imposibilidad; un error interno se informa separadamente.
+
+Trazabilidad: DEC-041, RF-GEN-016.
+
+### CA-GEN-024 — Sin resultado parcial
+
+Cuando la generación termina sin éxito, el sistema descarta el candidato parcial y no lo muestra ni permite guardarlo como mapa.
+
+Trazabilidad: DEC-041, RF-GEN-017.
+
 ## Recursos
 
 ### CA-REC-001 — Matriz
@@ -258,10 +294,58 @@ Trazabilidad: DEC-034, RF-EDI-007.
 
 ### CA-MAP-001 — Configuración conservada
 
-Al guardar y abrir un mapa, se conservan filas, columnas, microbiomas solicitados, `N`, radio y semilla cuando esta exista.
+Al guardar y abrir un mapa, se conservan filas, columnas, microbiomas solicitados, `N`, radio y semilla.
 
 Trazabilidad: DEC-035, RF-MAP-005.
 
+### CA-MAP-002 — Nombre válido y único
+
+El primer guardado recorta espacios exteriores y acepta únicamente un nombre de 1 a 100 caracteres que no coincida, sin distinguir mayúsculas, con otro mapa de la instalación. Una coincidencia se rechaza sin sobrescribir.
+
+Trazabilidad: DEC-044, DEC-045, RF-MAP-003, RF-MAP-006.
+
+### CA-MAP-003 — Identidad y actualización
+
+Después del primer guardado, Guardar mantiene el identificador y la fecha de creación, y actualiza atómicamente el estado, la fecha de modificación y la versión de concurrencia.
+
+Trazabilidad: DEC-044, DEC-045, RF-MAP-003, RF-MAP-006.
+
+### CA-MAP-004 — Guardar como y duplicar
+
+Guardar como y Duplicar crean una identidad con nombre, fechas y versión nuevos sin modificar el origen; Duplicar conserva el estado actual y el contexto histórico del mapa de origen.
+
+Trazabilidad: DEC-045, DEC-047, RF-MAP-006, RF-MAP-007.
+
+### CA-MAP-005 — Listado compartido
+
+Un mapa guardado aparece para los demás usuarios de la misma instalación con su nombre y fechas. El listado permite búsqueda parcial por nombre sin distinguir mayúsculas y orden por nombre, creación o modificación en ambos sentidos; inicialmente ordena por modificación descendente.
+
+Trazabilidad: DEC-043, DEC-046, RF-MAP-002, RF-MAP-009.
+
+### CA-MAP-006 — Eliminación definitiva
+
+Al solicitar eliminar, la interfaz muestra el nombre y permite cancelar. Al confirmar, elimina definitivamente el mapa y deja de aparecer en el listado compartido.
+
+Trazabilidad: DEC-045, RF-MAP-008.
+
+### CA-MAP-007 — Conflicto de concurrencia
+
+Dado un mapa modificado en la persistencia después de abrirse, Guardar con la versión anterior rechaza la actualización sin sobrescribir y permite recargar o utilizar Guardar como.
+
+Trazabilidad: DEC-048, RF-MAP-010.
+
+### CA-MAP-008 — Aislamiento histórico
+
+Dado un mapa guardado, modificar o desactivar posteriormente biomas, microbiomas, incompatibilidades o compatibilidades de gimnasio no cambia su estado ni su contexto histórico al volver a abrirlo.
+
+Trazabilidad: DEC-047, RF-MAP-011, RF-ADM-006.
+
+### CA-MAP-009 — Regeneración histórica
+
+Al regenerar desde un mapa guardado, el sistema usa la configuración, catálogos, definiciones y versión del algoritmo de su snapshot, no los catálogos operativos actuales.
+
+Trazabilidad: DEC-047, RF-MAP-011, RD-REG-007.
+
 ## Criterios pendientes
 
-Persistencia, propiedades y herramientas exactas de edición, detalles restantes de administración, errores de generación, accesibilidad y rendimiento requieren decisiones adicionales antes de contar con criterios verificables completos.
+El producto y esquema físico de persistencia, las propiedades y herramientas exactas de edición, los detalles restantes de administración, los mensajes exactos de generación, la accesibilidad y el rendimiento requieren decisiones adicionales antes de contar con criterios verificables completos.

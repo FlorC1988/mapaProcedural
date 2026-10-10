@@ -45,22 +45,26 @@ Este es el registro obligatorio de decisiones. Una fila aprobada autoriza única
 | DEC-037 | 2026-10-08 | Cantidades | La cantidad de microbiomas es 0..10, predeterminada en 2; N es 1..4, predeterminado en 2. | `03`, `04`, `05`, `06`, `09`, `11` | Aprobada |
 | DEC-038 | 2026-10-08 | Radio | El radio global es 0..2, predeterminado en 1; radio 0 afecta solo la celda del gimnasio. | `03`, `04`, `05`, `06`, `09`, `11` | Aprobada |
 | DEC-039 | 2026-10-08 | Validación de configuración | Cada tipo debe conservar al menos un bioma compatible. Los valores fuera de rango bloquean la generación; una configuración válida pero irresoluble falla sin reducir cantidades ni radio. Resuelve `PEN-018`. | `03`, `04`, `06`, `08`, `09`, `11` | Aprobada |
+| DEC-040 | 2026-10-09 | Algoritmo de generación | Usar backtracking global entre las fases de la secuencia aprobada, selección de la siguiente decisión mediante MRV y propagación de restricciones. Las alternativas se ordenan mediante el generador pseudoaleatorio sembrado. Resuelve `PEN-005`. | `03`, `04`, `06`, `11` | Aprobada |
+| DEC-041 | 2026-10-09 | Búsqueda y fallos | Aplicar a la generación completa un presupuesto determinista de nodos; cada intento de asignar una alternativa cuenta como un nodo. El valor se fijará tras benchmarks junto con los requisitos de rendimiento. Los resultados funcionales son éxito, ausencia de solución demostrada al agotar el espacio y presupuesto agotado; los errores internos se informan aparte. Todo candidato parcial se descarta. Resuelve `PEN-006`, salvo el valor numérico aplazado. | `03`, `06`, `09`, `10`, `11` | Aprobada |
+| DEC-042 | 2026-10-09 | Semilla y reproducibilidad | La semilla es visible y editable. Si el usuario no introduce una, el sistema la genera, muestra y conserva con el mapa. Toda elección aleatoria usa el generador pseudoaleatorio sembrado. La misma semilla, configuración, catálogos y definiciones, y versión del algoritmo produce exactamente el mismo resultado. Resuelve `PEN-007`. | `03`, `04`, `05`, `06`, `09`, `11` | Aprobada |
+| DEC-043 | 2026-10-09 | Alcance y modelo de persistencia | Los datos son compartidos por todos los usuarios de una misma instalación y se almacenan centralmente en una base relacional. Los catálogos operativos se representan como entidades normalizadas; cada mapa usa una cabecera relacional y un snapshot estructurado y atómico de su contenido y contexto. Resuelve `PEN-008` salvo el producto, esquema físico, migraciones y despliegue. | `01`, `03`, `05`, `08`, `09`, `10`, `11` | Aprobada |
+| DEC-044 | 2026-10-09 | Identidad y nombre de mapa | Cada mapa tiene identificador estable independiente del nombre, nombre obligatorio de 1 a 100 caracteres tras recortar espacios exteriores, fecha de creación, fecha de última modificación y versión de concurrencia. El nombre es único en la instalación sin distinguir mayúsculas. | `02`, `03`, `05`, `09`, `11` | Aprobada |
+| DEC-045 | 2026-10-09 | Operaciones sobre mapas | El primer guardado solicita nombre; Guardar actualiza la misma identidad; Guardar como y Duplicar crean otra identidad y exigen otro nombre único. Una coincidencia se rechaza sin sobrescribir. El borrado es definitivo tras una confirmación simple que muestra el nombre. Junto con `DEC-044` y `DEC-046`, resuelve `PEN-009`. | `03`, `05`, `09`, `11` | Aprobada |
+| DEC-046 | 2026-10-09 | Listado de mapas | El listado muestra nombre y fechas, permite búsqueda parcial por nombre sin distinguir mayúsculas y orden por nombre, creación o modificación en ambos sentidos. El orden inicial es última modificación descendente. | `03`, `09`, `11` | Aprobada |
+| DEC-047 | 2026-10-09 | Integridad histórica | Cada mapa conserva un snapshot inmutable del contexto completo: configuración, catálogos y definiciones elegibles con sus propiedades y estados, incompatibilidades, compatibilidades de gimnasio y versión del algoritmo, además de su resultado actual. Los cambios de catálogos no alteran mapas existentes. Regenerar desde un mapa usa su snapshot. Duplicar copia el estado actual y el snapshot. Resuelve `PEN-013`. | `03`, `04`, `05`, `06`, `08`, `09`, `11` | Aprobada |
+| DEC-048 | 2026-10-09 | Concurrencia de mapas | Guardar utiliza control optimista mediante la versión persistida. Si el mapa cambió desde que se abrió, el sistema rechaza la actualización sin sobrescribir y exige recargar o usar Guardar como. | `03`, `05`, `09`, `11` | Aprobada |
 
 ## Decisiones pendientes
 
 | ID | Tema | Opciones o pregunta | Impacto | Estado |
 |---|---|---|---|---|
-| PEN-005 | Generación base | Algoritmo concreto. | Arquitectura, rendimiento, pruebas | Pendiente |
-| PEN-006 | Búsqueda | Backtracking, reintentos, límites y tipos de fallo. | Generación, UX | Pendiente |
-| PEN-007 | Semilla | Reproducibilidad y exposición al usuario. | Datos, generación, UX | Pendiente |
-| PEN-008 | Persistencia | Tecnología y modelo para mapas y catálogos. | Arquitectura, datos | Pendiente |
-| PEN-009 | Mapas guardados | Nombre, metadatos, listado, borrado, duplicación y sobrescritura. | Producto, datos, UI | Pendiente |
 | PEN-010 | Edición | Propiedades y herramientas editables, posiciones vacías, deshacer y modificación de dimensiones. La política de validación fue resuelta por `DEC-015`. | Producto, dominio, UI | Pendiente |
 | PEN-012 | Administración | Protección del acceso sin cuentas. | Seguridad, arquitectura | Pendiente |
-| PEN-013 | Catálogos históricos | Efecto de modificar o desactivar entradas de catálogo usadas por mapas guardados. | Integridad, datos | Pendiente |
 | PEN-014 | Recursos | Inclusión de gimnasios y otros desgloses físicos. | Producto, UI | Pendiente |
 | PEN-015 | Representación visual | Gimnasios, alturas, biomas, microbiomas y errores. | UI, accesibilidad | Pendiente |
 | PEN-016 | Requisitos no funcionales | Rendimiento, compatibilidad, accesibilidad, seguridad y confiabilidad. | Arquitectura, aceptación | Pendiente |
+| PEN-019 | Tecnología de persistencia | Producto de base relacional, esquema físico, migraciones, copias de seguridad y despliegue. | Arquitectura, datos, operación | Pendiente |
 
 ## Plantilla para nuevas decisiones
 

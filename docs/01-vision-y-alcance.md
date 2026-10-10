@@ -27,7 +27,7 @@ La primera versión utilizable incluirá:
 
 1. Generación y visualización de mapas.
 2. Consulta de recursos físicos.
-3. Persistencia, listado y reapertura de mapas.
+3. Persistencia central compartida, listado y reapertura de mapas.
 4. Edición manual de mapas.
 5. Administración de biomas, incompatibilidades y microbiomas.
 6. Configuración de biomas compatibles de los 18 tipos fijos de gimnasio.

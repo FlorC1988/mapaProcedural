@@ -64,6 +64,11 @@ Datos confirmados:
 
 ```text
 Mapa
+├── identidad estable
+├── nombre único
+├── creadoEn
+├── modificadoEn
+├── versión de concurrencia
 ├── cantidad de filas (par)
 ├── cantidad de columnas (par)
 ├── configuración de generación
@@ -72,13 +77,22 @@ Mapa
 │   ├── microbiomas solicitados: 0..10, default 2
 │   ├── N gimnasios por cuadrante: 1..4, default 2
 │   ├── radio global: 0..2, default 1
-│   └── semilla (se incorporará si se aprueba PEN-007)
+│   └── semilla
 ├── posiciones
 ├── instancias de microbioma
-└── instancias de gimnasio
+├── instancias de gimnasio
+└── contexto histórico
+    ├── catálogos y definiciones elegibles, con propiedades y estados
+    ├── incompatibilidades
+    ├── compatibilidades de tipos de gimnasio
+    └── versión del algoritmo
 ```
 
-**Pendiente:** identidad, nombre, fechas, estado, versionado y demás metadatos necesarios para guardar mapas. La existencia y comportamiento de la semilla se resolverán mediante `PEN-007`; si se aprueba, formará parte de la configuración conservada.
+El nombre se recorta en sus extremos, debe contener entre 1 y 100 caracteres y es único en toda la instalación sin distinguir mayúsculas y minúsculas. La identidad no depende del nombre. `creadoEn` no cambia; `modificadoEn` y la versión de concurrencia cambian con cada actualización correcta.
+
+La semilla es visible y editable. Si el usuario no introduce una, el sistema genera una antes de buscar y la conserva con el mapa. La reproducción exacta requiere la misma semilla, configuración, estado de catálogos y definiciones, y versión del algoritmo.
+
+El contexto histórico es inmutable para la identidad del mapa: los cambios posteriores de catálogos no lo modifican. Guardar una edición reemplaza atómicamente el estado actual del snapshot, pero conserva ese contexto. Guardar como y Duplicar crean otra identidad; Duplicar copia el estado actual y el contexto, y ambos reciben nombre, fechas y versión de concurrencia nuevos.
 
 ## 4. Bioma
 
@@ -164,4 +178,11 @@ La instancia ocupa una sola posición, hereda su altura y conserva su identidad 
 
 ## 9. Persistencia
 
-**Pendiente:** tecnología, esquema, almacenamiento local o remoto, relaciones, migraciones e historial. Ninguna opción técnica está aprobada.
+La persistencia es central y compartida por todos los usuarios de una misma instalación. Utiliza una base relacional con dos modelos complementarios:
+
+- los catálogos operativos se almacenan como entidades normalizadas con sus relaciones e integridad;
+- cada mapa tiene una cabecera relacional y un snapshot estructurado que agrupa atómicamente su estado actual y su contexto histórico completo.
+
+Guardar una identidad existente compara la versión de concurrencia recibida con la persistida. Si difieren, la actualización se rechaza sin sobrescribir. Si coinciden, el estado, `modificadoEn` y la versión se actualizan en una única operación atómica.
+
+**Pendiente:** producto concreto de base relacional, tipos físicos, esquema detallado, formato y versión técnica del snapshot, migraciones, copias de seguridad y despliegue.

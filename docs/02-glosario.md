@@ -28,7 +28,9 @@
 
 **Coordenada visible:** par `(fila, columna)` numerado desde 1 y mostrado siempre al usuario. Las columnas visibles pares se desplazan medio hexágono hacia abajo.
 
-**Mapa o tablero:** configuración de posiciones hexagonales que representa el tablero físico. En esta documentación ambos términos se usan para el mismo resultado, salvo indicación expresa.
+**Mapa o tablero:** configuración identificable de posiciones hexagonales que representa el tablero físico. En esta documentación ambos términos se usan para el mismo resultado, salvo indicación expresa.
+
+**Snapshot de mapa:** representación estructurada y atómica del estado actual del mapa y de su contexto histórico completo. El contexto queda aislado de cambios posteriores en los catálogos.
 
 **Mapa base:** bioma, altura y eventual pertenencia a un microbioma de las posiciones, antes de colocar gimnasios y aplicar sus áreas de influencia.
 

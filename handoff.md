@@ -1,6 +1,6 @@
 # Handoff del proyecto
 
-Última actualización: 2026-10-08
+Última actualización: 2026-10-09
 
 ## Estado actual y fase
 
@@ -30,6 +30,8 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Corrección integral de inconsistencias: secuencia de generación, definición/instancia de microbioma, configuración persistida y catálogo fijo de 18 tipos de gimnasio.
 - Separación de requisitos pendientes y aprobados de edición, rechazo explícito de `N > 4`, alcance completo del MVP y aclaración del carácter futuro de la semilla.
 - Cierre de `PEN-001` y `PEN-018`: límites, valores predeterminados, compatibilidades no vacías y validación previa.
+- Cierre de `PEN-005`, `PEN-006` y `PEN-007`: backtracking global con MRV y propagación, presupuesto determinista por asignaciones, resultados diferenciados, descarte de parciales y semilla visible y editable.
+- Cierre de `PEN-008`, `PEN-009` y `PEN-013`: persistencia relacional compartida, cabecera y snapshot, identidad y nombres de mapa, operaciones, listado, concurrencia optimista e integridad histórica.
 
 ## Trabajo en curso
 
@@ -39,11 +41,11 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 ## Próximos pasos
 
 1. Presentar y resolver las decisiones pendientes por bloques, sin inferir respuestas.
-2. Resolver a continuación generación (`PEN-005`, `PEN-006`, `PEN-007`).
-3. Definir después edición, persistencia y administración.
-4. Definir posteriormente los flujos de edición, persistencia y administración.
-5. Aprobar requisitos no funcionales y criterios de aceptación faltantes.
-6. Elegir arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
+2. Resolver a continuación edición (`PEN-010`) y administración (`PEN-012`).
+3. Resolver recursos y representación visual (`PEN-014`, `PEN-015`).
+4. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
+5. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
+6. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
 7. Iniciar implementación únicamente con una especificación suficiente y aprobada.
 
 ## Decisiones
@@ -71,11 +73,26 @@ Decisiones rectoras:
 - catálogo inicial activo de Pradera, Agua, Roca, Magma e Hielo;
 - incompatibilidades simétricas, inicialmente Hielo–Magma;
 - biomas sin eliminación física y desactivación bloqueada por dependencias activas;
-- dimensiones pares 8..30 (default 16×16), microbiomas 0..10 (default 2), `N` 1..4 (default 2) y radio 0..2 (default 1).
+- dimensiones pares 8..30 (default 16×16), microbiomas 0..10 (default 2), `N` 1..4 (default 2) y radio 0..2 (default 1);
+- generación mediante backtracking global, MRV y propagación de restricciones;
+- presupuesto global determinista, con un nodo por intento de asignación y valor numérico pendiente de benchmarks;
+- resultados diferenciados entre éxito, ausencia de solución demostrada y presupuesto agotado, con errores internos aparte y descarte de parciales;
+- semilla visible y editable, generada si se omite, con reproducibilidad exacta bajo contexto idéntico;
+- persistencia central compartida en base relacional, con catálogos normalizados y mapas mediante cabecera y snapshot atómico;
+- mapas con identidad estable, nombre único de 1..100 caracteres, fechas y versión de concurrencia;
+- Guardar, Guardar como, Duplicar, listado con búsqueda y orden, y eliminación definitiva confirmada;
+- snapshots históricos aislados de cambios de catálogo y usados para regenerar mapas guardados;
+- rechazo de actualizaciones desactualizadas mediante concurrencia optimista.
 
 ## Contexto técnico
 
-Todavía no hay arquitectura, lenguaje, framework, base de datos ni estrategia de despliegue aprobados. No deben seleccionarse por inferencia.
+Está aprobada una base relacional central y compartida como clase de persistencia, con catálogos normalizados y cabecera más snapshot estructurado para mapas. Todavía no hay producto concreto de base de datos, esquema físico, migraciones, lenguaje, framework, arquitectura general ni estrategia de despliegue aprobados. No deben seleccionarse por inferencia.
+
+Cada mapa tiene identidad estable, nombre único, fechas y versión de concurrencia. El contexto histórico del snapshot no cambia con los catálogos operativos y se usa al regenerar. Las actualizaciones desactualizadas se rechazan sin sobrescribir.
+
+El generador usa backtracking global entre las fases aprobadas, MRV y propagación de restricciones. Cada alternativa intentada consume un nodo de un presupuesto global determinista cuyo valor se fijará tras benchmarks. Agotar el espacio demuestra ausencia de solución; agotar el presupuesto no. Los candidatos parciales se descartan.
+
+Toda aleatoriedad procede de una semilla visible y editable. Si se omite, se genera y muestra antes de buscar. La repetición exacta exige la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo.
 
 La geometría aprobada usa coordenadas axiales `(q, r)` para la lógica y `(fila, columna)` para la interfaz. Las columnas visibles pares se desplazan medio hexágono hacia abajo y las coordenadas visibles se muestran siempre.
 
@@ -92,11 +109,15 @@ Archivos relevantes:
 - `docs/00-gobierno.md`: proceso obligatorio.
 - `docs/03-requisitos-funcionales.md`: capacidades y estados.
 - `docs/04-reglas-de-dominio.md`: restricciones del tablero.
+- `docs/05-modelo-de-datos.md`: estructura conceptual y modelo de persistencia.
+- `docs/08-administracion-de-catalogos.md`: operación e integridad histórica de catálogos.
+- `docs/09-interfaz-y-flujos.md`: flujos de generación, guardado, reapertura y edición.
+- `docs/11-criterios-de-aceptacion.md`: comportamientos verificables.
 - `docs/12-decisiones.md`: decisiones aprobadas y pendientes.
 
 ## Verificación
 
-Última verificación documental: 2026-10-08.
+Última verificación documental: 2026-10-09.
 
 - 16 archivos Markdown esperados;
 - enlaces relativos sin errores;
@@ -105,17 +126,18 @@ Archivos relevantes:
 - decisiones reemplazadas conservadas como obsoletas;
 - referencias normativas alineadas con catálogo fijo, sin entidad Elemento;
 - borrador intacto: 12 970 bytes, SHA-256 `5dd152cab33ba7f4334e2d33c9c5673eb0b06b1ca1d0d3ec7dff7be08ff66436`;
-- revisión residual completada: requisitos de edición separados, `N > 4` rechazado, alcance actualizado y semilla condicionada a `PEN-007`;
+- revisión residual completada: requisitos de edición separados, `N > 4` rechazado y alcance actualizado;
 - límites y valores predeterminados propagados de forma consistente; `PEN-001` y `PEN-018` solo permanecen como trazabilidad de decisiones resueltas;
+- algoritmo, búsqueda, fallos y semilla propagados; `PEN-005`, `PEN-006` y `PEN-007` solo permanecen como trazabilidad de decisiones resueltas;
+- persistencia, mapas guardados e integridad histórica propagados; `PEN-008`, `PEN-009` y `PEN-013` solo permanecen como trazabilidad de decisiones resueltas;
 - no existe código que verificar en esta fase.
 
 ## Problemas conocidos
 
 - El actor administrador no tiene un mecanismo de acceso aprobado.
 - Las propiedades y herramientas exactas de edición todavía no están definidas.
-- La persistencia está aprobada funcionalmente, pero no su comportamiento ni tecnología.
-- El algoritmo y los límites de búsqueda no están definidos.
-- Los límites numéricos están cerrados, pero el algoritmo y los límites de búsqueda aún no garantizan qué combinaciones válidas resultarán resolubles.
+- El producto, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue de la base relacional no están aprobados.
+- El valor numérico del presupuesto de nodos depende de benchmarks y requisitos de rendimiento aún no aprobados.
 
 ## Deuda técnica
 
@@ -123,8 +145,8 @@ No existe implementación, por lo que todavía no hay deuda técnica de código.
 
 - completar trazabilidad integral entre requisitos, reglas y criterios;
 - convertir decisiones pendientes en especificaciones verificables;
-- definir versionado e integridad histórica de catálogos y mapas;
-- definir requisitos no funcionales medibles.
+- definir el producto, esquema físico, migraciones y operación de la persistencia relacional;
+- definir requisitos no funcionales medibles y fijar mediante benchmarks el presupuesto de nodos.
 
 ## Instrucciones para el siguiente agente
 

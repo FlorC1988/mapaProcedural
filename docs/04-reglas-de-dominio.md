@@ -54,6 +54,9 @@
 - **RD-REG-002:** las incompatibilidades configuradas en los biomas son obligatorias.
 - **RD-REG-003:** la primera versión no utiliza preferencias blandas.
 - **RD-REG-004:** el generador solo debe satisfacer reglas explícitas; no debe buscar belleza, naturalidad, variedad, agrupamiento o equilibrio visual.
+- **RD-REG-005:** toda elección aleatoria de la generación se obtiene del mismo generador pseudoaleatorio inicializado con la semilla conservada en la configuración.
+- **RD-REG-006:** con la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo, la generación recorre las mismas alternativas y produce exactamente el mismo resultado.
+- **RD-REG-007:** al regenerar desde un mapa guardado, los catálogos y definiciones de su snapshot constituyen el contexto de generación y no se sustituyen por los catálogos operativos actuales.
 
 ## 7. Microbiomas
 

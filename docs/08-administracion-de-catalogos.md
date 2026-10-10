@@ -30,9 +30,9 @@ El administrador podrá gestionar microbiomas. Cada definición debe expresar po
 - operaciones administrativas exactas;
 - interfaz de edición;
 - validación estructural antes de activar;
-- formato de coordenadas relativas;
-- efecto de cambios sobre mapas existentes;
-- versionado o copia histórica.
+- formato de coordenadas relativas.
+
+Los cambios de una definición no alteran las copias históricas conservadas dentro de mapas existentes.
 
 Un microbioma nuevo solo puede utilizar biomas activos. La administración de definiciones no cambia la regla de generación: una vez seleccionado, un microbioma no se rota ni refleja; sus biomas solo pueden alterarse por la influencia prioritaria aprobada de un gimnasio.
 
@@ -42,7 +42,7 @@ Existen exactamente 18 tipos fijos: Acero, Agua, Bicho, Dragón, Eléctrico, Fan
 
 No pueden crearse, eliminarse, activarse ni desactivarse. Cualquier usuario, sin cuenta, puede configurar únicamente la lista de biomas compatibles activos de cada tipo. Inicialmente, los cinco biomas son compatibles con los 18 tipos.
 
-La interfaz impide guardar un cambio que deje un tipo sin biomas compatibles. El tratamiento histórico de cambios de compatibilidad en mapas guardados continúa pendiente.
+La interfaz impide guardar un cambio que deje un tipo sin biomas compatibles. Cambiar compatibilidades afecta únicamente al catálogo operativo y a contextos creados posteriormente; los snapshots de mapas existentes no cambian.
 
 ## 4. Acceso administrativo
 
@@ -52,4 +52,6 @@ La aplicación no tendrá cuentas de usuario, pero existe un actor administrador
 
 ## 5. Integridad histórica
 
-**Pendiente:** decidir qué ocurre cuando se modifican o desactivan entradas de catálogo utilizadas en mapas guardados. Todavía no se aprueba una estrategia general de versionado.
+Los catálogos operativos son compartidos por toda la instalación. Cada mapa guarda un snapshot de la configuración, los catálogos y definiciones elegibles con sus propiedades y estados, las incompatibilidades, las compatibilidades de gimnasio y la versión del algoritmo. Modificar o desactivar una entrada operativa no altera ningún snapshot existente.
+
+Abrir un mapa muestra su estado guardado aunque incluya datos actualmente inactivos. Regenerar desde él usa su contexto histórico. Las restricciones sobre datos activos continúan aplicándose a configuraciones nuevas y a las herramientas de edición manual.

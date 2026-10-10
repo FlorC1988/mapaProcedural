@@ -14,11 +14,15 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 - **RF-GEN-006 — Aprobado:** si no puede colocar la cantidad solicitada de microbiomas o gimnasios, la generación fallará sin reducirla automáticamente.
 - **RF-GEN-007 — Aprobado:** el resultado puede ser cualquier solución válida; no se exige calidad estética, variedad ni equilibrio.
 - **RF-GEN-008 — Aprobado:** filas y columnas serán valores pares independientes entre 8 y 30, predeterminados en 16×16; microbiomas será 0..10, predeterminado en 2; `N` será 1..4, predeterminado en 2; radio será 0..2, predeterminado en 1.
-- **RF-GEN-009 — Pendiente:** semilla y reproducibilidad.
+- **RF-GEN-009 — Aprobado:** la semilla será visible y editable; si el usuario no introduce una, el sistema la generará, mostrará y conservará con el mapa. Con la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo, el resultado será idéntico.
 - **RF-GEN-010 — Aprobado:** el tablero se dividirá en cuatro cuadrantes iguales y requerirá cantidades pares de filas y columnas.
 - **RF-GEN-011 — Aprobado:** el sistema seleccionará aleatoriamente `4 × N` tipos distintos del catálogo fijo de 18; por ello `N ≤ 4`.
 - **RF-GEN-012 — Aprobado:** el sistema impedirá generar con cualquier parámetro fuera de rango; si con parámetros válidos no puede resolver el mapa, fallará sin reducir microbiomas, `N` ni radio.
 - **RF-GEN-013 — Aprobado:** cada tipo de gimnasio conservará al menos un bioma compatible.
+- **RF-GEN-014 — Aprobado:** el sistema resolverá la generación completa mediante backtracking global, seleccionará la siguiente decisión con MRV, propagará restricciones y ordenará las alternativas mediante el generador pseudoaleatorio sembrado.
+- **RF-GEN-015 — Aprobado:** la búsqueda tendrá un presupuesto global y determinista; cada intento de asignar una alternativa contará como un nodo. Su valor numérico se fijará después de realizar benchmarks.
+- **RF-GEN-016 — Aprobado:** la generación distinguirá éxito, ausencia de solución demostrada al agotar el espacio y presupuesto agotado; los errores internos se informarán por separado.
+- **RF-GEN-017 — Aprobado:** cualquier candidato parcial se descartará y no se mostrará ni guardará como mapa.
 
 ## Visualización y recursos
 
@@ -33,10 +37,16 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 ## Mapas guardados
 
 - **RF-MAP-001 — Aprobado:** el usuario podrá guardar mapas.
-- **RF-MAP-002 — Aprobado:** el usuario podrá consultar y volver a abrir mapas guardados.
-- **RF-MAP-003 — Pendiente:** nombre, metadatos, listado, eliminación, duplicación y política de sobrescritura.
-- **RF-MAP-004 — Pendiente:** medio y modelo técnico de persistencia.
-- **RF-MAP-005 — Aprobado:** cada mapa conservará su configuración completa: filas, columnas, microbiomas solicitados, `N`, radio y futura semilla.
+- **RF-MAP-002 — Aprobado:** el usuario podrá consultar y volver a abrir mapas guardados compartidos por toda la instalación.
+- **RF-MAP-003 — Aprobado:** cada mapa tendrá identificador estable, nombre obligatorio único sin distinguir mayúsculas, fecha de creación, fecha de última modificación y versión de concurrencia. El nombre tendrá entre 1 y 100 caracteres después de recortar espacios exteriores.
+- **RF-MAP-004 — Aprobado:** la persistencia central utilizará una base relacional, catálogos operativos normalizados y, para cada mapa, una cabecera relacional y un snapshot estructurado y atómico.
+- **RF-MAP-005 — Aprobado:** cada mapa conservará su configuración completa: filas, columnas, microbiomas solicitados, `N`, radio y semilla.
+- **RF-MAP-006 — Aprobado:** el primer Guardar solicitará nombre; Guardar actualizará la misma identidad; Guardar como y Duplicar crearán otra identidad con un nombre único distinto. Una coincidencia de nombre se rechazará sin sobrescribir.
+- **RF-MAP-007 — Aprobado:** Duplicar copiará el estado actual y el contexto histórico del mapa, pero asignará identificador, nombre, fechas y versión de concurrencia nuevos.
+- **RF-MAP-008 — Aprobado:** eliminar un mapa será definitivo y requerirá una confirmación simple que muestre su nombre.
+- **RF-MAP-009 — Aprobado:** el listado mostrará nombre y fechas, permitirá buscar parcialmente por nombre sin distinguir mayúsculas y ordenar por nombre, creación o modificación en ambos sentidos; inicialmente ordenará por modificación descendente.
+- **RF-MAP-010 — Aprobado:** Guardar rechazará una actualización si la versión persistida cambió desde que se abrió el mapa, sin sobrescribir; el usuario deberá recargar o utilizar Guardar como.
+- **RF-MAP-011 — Aprobado:** cada mapa conservará un contexto histórico completo e inmutable. Los cambios posteriores de catálogos no alterarán el mapa y regenerar desde él utilizará ese contexto.
 
 ## Edición
 
@@ -59,7 +69,7 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 - **RF-ADM-003 — Aprobado:** un administrador podrá gestionar microbiomas.
 - **RF-ADM-004 — Pendiente:** operaciones exactas disponibles para cada catálogo.
 - **RF-ADM-005 — Pendiente:** protección del acceso administrativo.
-- **RF-ADM-006 — Pendiente:** efecto de modificar o desactivar datos utilizados por mapas guardados.
+- **RF-ADM-006 — Aprobado:** modificar o desactivar datos de catálogo no alterará el contenido ni el contexto histórico de mapas guardados existentes.
 
 ## Autenticación
 
