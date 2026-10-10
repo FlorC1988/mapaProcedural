@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, ErrorApi, type Bioma, type TipoGimnasio } from "../api";
+import Modal from "../componentes/Modal";
 
 export default function TiposAdmin({
   tipos,
@@ -86,14 +87,17 @@ export default function TiposAdmin({
         </tbody>
       </table>
       {editando && (
+        <Modal
+          abierto
+          titulo={`Biomas compatibles con ${editando.nombre}`}
+          onCerrar={() => setEditando(null)}
+        >
         <form
-          className="form-admin"
           onSubmit={(e) => {
             e.preventDefault();
             void guardar();
           }}
         >
-          <h4>Biomas compatibles con {editando.nombre}</h4>
           {activos.map((b) => (
             <label key={b.id} className="check">
               <input
@@ -113,6 +117,7 @@ export default function TiposAdmin({
             </button>
           </div>
         </form>
+        </Modal>
       )}
     </>
   );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, ErrorApi, type Bioma } from "../api";
+import Modal from "../componentes/Modal";
 
 interface FormBioma {
   nombre: string;
@@ -138,14 +139,17 @@ export default function BiomasAdmin({
         </button>
       )}
       {editando && (
+        <Modal
+          abierto
+          titulo={editando === "nuevo" ? "Nuevo bioma" : `Editar ${editando.nombre}`}
+          onCerrar={() => setEditando(null)}
+        >
         <form
-          className="form-admin"
           onSubmit={(e) => {
             e.preventDefault();
             void guardar();
           }}
         >
-          <h4>{editando === "nuevo" ? "Nuevo bioma" : `Editar ${editando.nombre}`}</h4>
           <label>
             Nombre
             <input
@@ -196,6 +200,7 @@ export default function BiomasAdmin({
             </button>
           </div>
         </form>
+        </Modal>
       )}
     </>
   );

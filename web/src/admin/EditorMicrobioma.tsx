@@ -202,13 +202,12 @@ export default function EditorMicrobioma({
 
   return (
     <form
-      className="form-admin editor-microbioma"
+      className="editor-microbioma"
       onSubmit={(e) => {
         e.preventDefault();
         void guardar();
       }}
     >
-      <h4>{definicion ? `Editar "${definicion.nombre}"` : "Nueva definición de microbioma"}</h4>
       {error && (
         <div className="aviso-error" role="alert">
           {error}

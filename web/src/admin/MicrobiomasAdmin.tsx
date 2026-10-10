@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, ErrorApi, type Bioma, type DefinicionMicrobioma } from "../api";
 import EditorMicrobioma from "./EditorMicrobioma";
+import Modal from "../componentes/Modal";
 
 export default function MicrobiomasAdmin({
   biomas,
@@ -43,19 +44,24 @@ export default function MicrobiomasAdmin({
     }
   }
 
-  if (editando) {
-    return (
+  const modal = editando && (
+    <Modal
+      abierto
+      titulo={editando === "nuevo" ? "Nueva definición de microbioma" : `Editar "${editando.nombre}"`}
+      onCerrar={() => setEditando(null)}
+    >
       <EditorMicrobioma
         definicion={editando === "nuevo" ? null : editando}
         biomas={biomas}
         onGuardado={onCambio}
         onCerrar={() => setEditando(null)}
       />
-    );
-  }
+    </Modal>
+  );
 
   return (
     <>
+      {modal}
       <h3>Definiciones de microbioma</h3>
       {error && (
         <div className="aviso-error" role="alert">
