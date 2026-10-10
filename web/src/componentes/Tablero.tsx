@@ -213,6 +213,17 @@ export default function Tablero({
           }}
           onPointerLeave={() => (arrastre.current = null)}
         >
+          <defs>
+            <pattern
+              id="trama-gym"
+              width="6"
+              height="6"
+              patternTransform="rotate(45)"
+              patternUnits="userSpaceOnUse"
+            >
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#7f1d1d" strokeWidth="1.2" opacity="0.45" />
+            </pattern>
+          </defs>
           <g transform={`translate(${vista.x} ${vista.y}) scale(${vista.k})`}>
             {mapa.celdas.map((c) => {
               const { cx, cy } = centro(c.fila, c.columna);
@@ -224,7 +235,7 @@ export default function Tablero({
                   key={`${c.fila}-${c.columna}`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Celda ${c.fila}, ${c.columna}: ${bioma?.nombre ?? c.bioma}, Z${c.altura}`}
+                  aria-label={`Celda ${c.fila}, ${c.columna}: ${bioma?.nombre ?? c.bioma}, Z${c.altura}${gym ? `, gimnasio ${tipoPorId.get(gym.tipoId)?.nombre}` : ""}`}
                   onClick={() => setSeleccion({ fila: c.fila, columna: c.columna })}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -240,20 +251,30 @@ export default function Tablero({
                     stroke={sel ? "#18181b" : "#fafafa"}
                     strokeWidth={sel ? 3 : 1.5}
                   />
+                  {gym && (
+                    <polygon
+                      points={poligono(cx, cy)}
+                      fill="url(#trama-gym)"
+                      stroke="#7f1d1d"
+                      strokeWidth={2.5}
+                      pointerEvents="none"
+                    />
+                  )}
                   <text x={cx} y={cy - 5} textAnchor="middle" fontSize={8} fill="#18181b" pointerEvents="none">
                     {c.fila},{c.columna}
                   </text>
-                  <text x={cx} y={cy + 4} textAnchor="middle" fontSize={9} fill="#3f3f46" pointerEvents="none">
-                    {bioma?.icono}
-                  </text>
+                  {gym ? (
+                    <text x={cx} y={cy + 4} textAnchor="middle" fontSize={7.5} fontWeight={700} fill="#7f1d1d" pointerEvents="none">
+                      ⬢ {tipoPorId.get(gym.tipoId)?.nombre}
+                    </text>
+                  ) : (
+                    <text x={cx} y={cy + 4} textAnchor="middle" fontSize={9} fill="#3f3f46" pointerEvents="none">
+                      {bioma?.icono}
+                    </text>
+                  )}
                   <text x={cx} y={cy + 15} textAnchor="middle" fontSize={10} fontWeight={600} fill="#18181b" pointerEvents="none">
                     Z{c.altura}
                   </text>
-                  {gym && (
-                    <text x={cx} y={cy - 14} textAnchor="middle" fontSize={9} fontWeight={700} fill="#7f1d1d" pointerEvents="none">
-                      ⬢ {tipoPorId.get(gym.tipoId)?.nombre}
-                    </text>
-                  )}
                 </g>
               );
             })}
