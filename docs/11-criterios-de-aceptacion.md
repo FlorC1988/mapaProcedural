@@ -158,9 +158,33 @@ Trazabilidad: RF-REC-001, RD-REC-001.
 
 ### CA-REC-002 — Recálculo tras edición
 
-Dada una edición manual, cuando se aplica el cambio, la matriz se recalcula y sus cantidades coinciden con los biomas y alturas actuales.
+Dada una edición manual, cuando se aplica el cambio, la matriz de piezas y la tabla de gimnasios se recalculan y coinciden con el estado actual.
 
-Trazabilidad: RF-REC-004, DEC-018.
+Trazabilidad: RF-REC-004, DEC-018, DEC-059.
+
+### CA-REC-003 — Filas de bioma
+
+La matriz muestra exactamente una fila por cada bioma presente, incluidos históricos inactivos, ordenadas por nombre; no muestra biomas ausentes y cada posición contribuye una sola unidad.
+
+Trazabilidad: DEC-059, RF-REC-001, RD-REC-003, RD-REC-005.
+
+### CA-REC-004 — Sin desglose de microbiomas
+
+Las celdas de microbiomas contribuyen a la matriz general por su bioma y altura actuales, sin tabla ni subtotal adicional por instancia o definición.
+
+Trazabilidad: DEC-059, RF-REC-002, RD-REC-003.
+
+### CA-REC-005 — Marcadores de gimnasio
+
+La tabla separada muestra exactamente una fila por cada tipo de gimnasio presente, su cantidad y un total; no muestra tipos ausentes y cada gimnasio contribuye un marcador.
+
+Trazabilidad: DEC-059, RF-REC-003, RD-REC-004, RD-REC-005.
+
+### CA-REC-006 — Totales
+
+Los totales por fila, por altura y generales de la matriz, y el total de la tabla de gimnasios, coinciden con la suma de sus respectivos valores.
+
+Trazabilidad: DEC-059, RF-REC-001, RF-REC-003.
 
 ## Edición
 
@@ -192,9 +216,51 @@ Trazabilidad: RF-EDI-006, DEC-017.
 
 ### CA-VIS-001 — Superposición de gimnasio
 
-Dada una posición con gimnasio, la interfaz muestra la instancia y su tipo sobre el bioma actual de la celda sin cambiar la altura heredada.
+Dada una posición con gimnasio, la interfaz muestra un símbolo y la etiqueta de su tipo sobre el bioma actual sin ocultar sus datos ni cambiar la altura heredada.
 
 Trazabilidad: RF-VIS-003, RD-GIM-001, RD-GIM-002, RD-GIM-015.
+
+### CA-VIS-002 — Bioma y altura
+
+Cada celda muestra color e icono del bioma, su nombre como texto accesible y una etiqueta persistente Z1, Z2 o Z3, por lo que el bioma no se identifica únicamente mediante color.
+
+Trazabilidad: DEC-060, RF-VIS-002.
+
+### CA-VIS-003 — Contorno de microbioma
+
+Cada instancia asociada se distingue mediante un contorno propio y, al seleccionarla, la interfaz muestra su nombre e identidad. Las celdas desvinculadas dejan de mostrar ese contorno.
+
+Trazabilidad: DEC-061, RF-VIS-004.
+
+### CA-VIS-004 — Capa de influencia
+
+Al abrir el tablero, las áreas de influencia están ocultas. Al activar la capa se muestran únicamente las áreas asociadas existentes; un gimnasio editado sin área no muestra ninguna.
+
+Trazabilidad: DEC-061, RF-VIS-005.
+
+### CA-VIS-005 — Panel de celda
+
+Seleccionar una celda muestra coordenadas visibles, bioma y altura, y añade los datos de gimnasio o microbioma únicamente cuando existen.
+
+Trazabilidad: DEC-061, RF-VIS-006.
+
+### CA-VIS-006 — Ajuste y zoom
+
+Al abrirse, el tablero se ajusta al espacio disponible; el usuario puede acercar o alejar mediante controles y rueda, y desplazarse mediante arrastre.
+
+Trazabilidad: DEC-062, RF-VIS-007.
+
+### CA-VIS-007 — Errores de campo
+
+Una entrada inválida muestra el error junto al control afectado y también en un resumen visible.
+
+Trazabilidad: DEC-062, RF-VIS-008.
+
+### CA-VIS-008 — Fallos de operación
+
+Un fallo de generación, guardado u otra operación muestra un aviso persistente con la causa conocida y una acción posible, cuando exista.
+
+Trazabilidad: DEC-062, RF-VIS-008.
 
 ## Geometría
 
@@ -336,9 +402,9 @@ Trazabilidad: DEC-053, RF-EDI-013.
 
 ### CA-EDI-013 — Recursos tras historial
 
-Después de deshacer o rehacer, la matriz de recursos coincide con los biomas y alturas resultantes.
+Después de deshacer o rehacer, la matriz de piezas y la tabla de gimnasios coinciden con el estado resultante.
 
-Trazabilidad: DEC-053, RF-REC-004.
+Trazabilidad: DEC-053, DEC-059, RF-REC-004.
 
 ### CA-ADM-001 — Acceso administrativo abierto
 
@@ -450,4 +516,4 @@ Trazabilidad: DEC-047, RF-MAP-011, RD-REG-007.
 
 ## Criterios pendientes
 
-El producto y esquema físico de persistencia, el desglose de recursos, la representación visual, los mensajes exactos de generación, la accesibilidad y el rendimiento requieren decisiones adicionales antes de contar con criterios verificables completos.
+El producto y esquema físico de persistencia, los objetivos medibles de accesibilidad, los requisitos restantes de calidad y rendimiento y los detalles técnicos de mensajes y observabilidad requieren decisiones adicionales antes de contar con criterios verificables completos.

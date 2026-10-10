@@ -75,11 +75,22 @@ La grilla utiliza hexágonos con lado horizontal arriba (flat-top). Las columnas
 
 Cada posición muestra siempre sus coordenadas `(fila, columna)`, numeradas desde 1. El sistema utiliza coordenadas axiales internamente, sin exponerlas como coordenadas principales al usuario.
 
-Deben poder identificarse bioma, altura y gimnasio; este último se muestra superpuesto sin ocultar la existencia lógica del bioma.
+Cada celda usa el color de fondo y el icono configurados para su bioma, junto con una etiqueta persistente Z1, Z2 o Z3. El nombre del bioma está disponible como texto accesible y la identificación no depende únicamente del color.
 
-**Pendiente:**
+Un gimnasio se superpone mediante un símbolo distintivo y una etiqueta de su tipo sin ocultar los datos lógicos del bioma y la altura. Cada instancia de microbioma se delimita con un contorno propio; al seleccionarla se muestran su nombre e identidad.
 
-- zoom, desplazamiento y adaptación a distintos tamaños;
-- colores, iconos y accesibilidad visual;
-- representación de alturas y gimnasios;
-- indicación visual de microbiomas y errores.
+Las áreas de influencia generadas están ocultas inicialmente y se muestran mediante una capa conmutable. La capa solo dibuja áreas asociadas existentes; un gimnasio creado o editado manualmente sin área no muestra influencia.
+
+Seleccionar una celda abre un panel con coordenadas, nombre de bioma, altura y, cuando correspondan, tipo e identidad de gimnasio y nombre e identidad de microbioma.
+
+El tablero se ajusta inicialmente al espacio disponible. Ofrece controles de zoom, zoom con rueda y desplazamiento por arrastre.
+
+Los errores de campo aparecen junto al control afectado y también en un resumen visible. Los fallos de operación se muestran mediante un aviso persistente que explica la causa conocida y la acción disponible.
+
+## 6. Recursos físicos
+
+La matriz de piezas contiene una fila por cada bioma presente en el mapa actual, incluido cualquier bioma histórico inactivo, ordenadas por nombre. Sus columnas son Z1, Z2, Z3 y Total, con una fila final de totales. No aparecen biomas con cantidad cero y no existe un desglose adicional por microbioma.
+
+Una tabla separada de marcadores de gimnasio contiene una fila por cada tipo presente y una fila de total. No muestra tipos con cantidad cero.
+
+Ambas tablas se recalculan después de editar, deshacer o rehacer. La matriz cuenta cada posición una sola vez por su bioma y altura actuales; la tabla cuenta cada gimnasio una sola vez por su tipo actual.

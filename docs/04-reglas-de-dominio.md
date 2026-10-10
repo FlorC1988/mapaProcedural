@@ -94,7 +94,7 @@
 - **RD-GIM-012:** la asignación de biomas del área debe respetar las incompatibilidades con todas las celdas adyacentes aplicables.
 - **RD-GIM-013:** la influencia no cambia alturas; solo cambia biomas.
 - **RD-GIM-014:** la influencia puede modificar biomas de un microbioma sin desvincularlo. Sus alturas, identidad, pertenencia y excepciones internas se conservan.
-- **RD-GIM-015:** la representación visual del gimnasio tiene prioridad sobre la del bioma de su celda.
+- **RD-GIM-015:** la representación visual del gimnasio tiene prioridad sobre la del bioma de su celda y muestra un símbolo con su tipo sin ocultar los datos lógicos del bioma y la altura.
 - **RD-GIM-016:** agregar, mover o cambiar el tipo de un gimnasio durante la edición manual no modifica biomas y deja la instancia sin área de influencia asociada; quitarlo elimina solo la instancia. Las celdas de origen o destino asociadas a microbiomas aplican la desvinculación completa de la instancia.
 - **RD-GIM-017:** las restricciones de tipos distintos, adyacencia, cuadrante y áreas pertenecen a la generación y no limitan la edición manual de gimnasios.
 
@@ -102,6 +102,9 @@
 
 - **RD-REC-001:** los recursos se contabilizan por combinación de bioma y altura.
 - **RD-REC-002:** el cálculo representa configuraciones necesarias y no piezas permanentemente ensambladas ni inventario disponible.
+- **RD-REC-003:** cada posición del mapa actual contribuye exactamente una unidad a la matriz de piezas, incluso si pertenece a un microbioma o contiene un gimnasio.
+- **RD-REC-004:** cada gimnasio actual contribuye exactamente un marcador a la tabla separada de gimnasios, agrupado por tipo.
+- **RD-REC-005:** los biomas históricos inactivos presentes se incluyen; no se muestran filas de biomas ni tipos de gimnasio con cantidad cero.
 
 ## 10. Validez de la generación automática
 

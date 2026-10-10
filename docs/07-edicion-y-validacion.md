@@ -17,7 +17,7 @@ Después de generado, el mapa puede modificarse libremente. Un mapa editado no s
 - Un cambio no se rechaza por romper restricciones de altura, biomas, microbiomas o gimnasios.
 - La interfaz no presenta esas diferencias como errores de validez.
 - Guardar o abrir no ejecuta una validación.
-- La matriz de recursos se recalcula después de cada edición y representa los biomas y alturas actuales.
+- La matriz de piezas y la tabla de marcadores de gimnasio se recalculan después de cada edición y representan el estado actual.
 - Ninguna herramienta puede dejar una posición vacía.
 - Puede cambiarse el bioma por otro activo y asignarse cualquiera de las alturas Z1, Z2 o Z3.
 
@@ -62,7 +62,7 @@ Antes de aplicar la expansión se seleccionan un bioma activo y una altura para 
 
 Cada mapa mantiene durante la sesión un historial de múltiples operaciones. Cambiar una celda, editar un gimnasio, estampar, mover o desvincular un microbioma y expandir el tablero constituyen cada uno una operación completa y se deshacen o rehacen atómicamente.
 
-Una edición nueva después de deshacer elimina la rama disponible para rehacer. Cerrar o recargar el mapa limpia el historial. Después de deshacer o rehacer también se recalcula la matriz de recursos.
+Una edición nueva después de deshacer elimina la rama disponible para rehacer. Cerrar o recargar el mapa limpia el historial. Después de deshacer o rehacer también se recalculan la matriz de piezas y la tabla de gimnasios.
 
 ## 7. Nueva generación
 

@@ -34,6 +34,7 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Cierre de `PEN-008`, `PEN-009` y `PEN-013`: persistencia relacional compartida, cabecera y snapshot, identidad y nombres de mapa, operaciones, listado, concurrencia optimista e integridad histórica.
 - Cierre de `PEN-010` y `PEN-012`: herramientas completas de edición, expansión, historial de sesión y acceso administrativo abierto sin autenticación ni autorización.
 - Cierre de `PEN-020`: ciclo de vida, identidad, coordenadas axiales, validación, herramientas, listado y concurrencia del editor administrativo de microbiomas.
+- Cierre de `PEN-014` y `PEN-015`: matriz y tabla de recursos, codificación visual de celdas, gimnasios y microbiomas, capa de influencia, inspector, navegación y errores.
 
 ## Trabajo en curso
 
@@ -43,11 +44,11 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 ## Próximos pasos
 
 1. Presentar y resolver las decisiones pendientes por bloques, sin inferir respuestas.
-2. Resolver recursos y representación visual (`PEN-014`, `PEN-015`).
-3. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
-4. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
-5. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
-6. Completar la trazabilidad integral y revisar suficiencia de la especificación.
+2. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
+3. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
+4. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
+5. Completar la trazabilidad integral y revisar suficiencia de la especificación.
+6. Resolver cualquier decisión nueva descubierta durante la revisión.
 7. Iniciar implementación únicamente con una especificación suficiente y aprobada.
 
 ## Decisiones
@@ -92,7 +93,10 @@ Decisiones rectoras:
 - área administrativa abierta a cualquier usuario, sin autenticación ni autorización;
 - definiciones de microbioma identificables, sin eliminación física, siempre válidas y nuevas activas;
 - formas axiales conectadas de 1..900 celdas, con ancla, biomas activos y extensión máxima equivalente a 30×30;
-- editor administrativo con adición adyacente, eliminación conectada, reanclaje, selección múltiple, listado y concurrencia optimista.
+- editor administrativo con adición adyacente, eliminación conectada, reanclaje, selección múltiple, listado y concurrencia optimista;
+- matriz de piezas por bioma y altura y tabla separada de marcadores por tipo de gimnasio;
+- celdas con color, icono, altura y coordenadas; gimnasios con símbolo y tipo; microbiomas con contorno;
+- capa conmutable de influencia, panel de detalle, ajuste inicial, zoom, desplazamiento y errores persistentes.
 
 ## Contexto técnico
 
@@ -104,6 +108,7 @@ El editor no admite posiciones vacías. Permite modificar bioma, altura, gimnasi
 
 El área administrativa no tiene protección en el MVP y está disponible para cualquier usuario de la instalación. Las definiciones de microbioma tienen identidad, nombre único, estado y versión; usan coordenadas axiales relativas conectadas respecto de un ancla y solo se guardan si cumplen todas las validaciones. No se eliminan físicamente y las nuevas se crean activas.
 
+Los recursos se presentan como matriz de piezas por bioma y altura y tabla separada de gimnasios por tipo. La visualización combina color, iconos y texto; superpone gimnasios, contornea microbiomas y ofrece una capa de influencia conmutable, inspector de celda, zoom y desplazamiento.
 El generador usa backtracking global entre las fases aprobadas, MRV y propagación de restricciones. Cada alternativa intentada consume un nodo de un presupuesto global determinista cuyo valor se fijará tras benchmarks. Agotar el espacio demuestra ausencia de solución; agotar el presupuesto no. Los candidatos parciales se descartan.
 
 Toda aleatoriedad procede de una semilla visible y editable. Si se omite, se genera y muestra antes de buscar. La repetición exacta exige la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo.
@@ -146,6 +151,7 @@ Archivos relevantes:
 - persistencia, mapas guardados e integridad histórica propagados; `PEN-008`, `PEN-009` y `PEN-013` solo permanecen como trazabilidad de decisiones resueltas;
 - herramientas de edición y acceso administrativo propagados; `PEN-010` y `PEN-012` solo permanecen como trazabilidad de decisiones resueltas;
 - administración de microbiomas propagada; `PEN-020` solo permanece como trazabilidad de una decisión resuelta;
+- recursos y representación visual propagados; `PEN-014` y `PEN-015` solo permanecen como trazabilidad de decisiones resueltas;
 - no existe código que verificar en esta fase.
 
 ## Problemas conocidos
@@ -158,7 +164,7 @@ Archivos relevantes:
 No existe implementación, por lo que todavía no hay deuda técnica de código. Se registra como deuda documental:
 
 - completar trazabilidad integral entre requisitos, reglas y criterios;
-- convertir las decisiones pendientes de recursos, representación y calidad en especificaciones verificables;
+- convertir los requisitos no funcionales pendientes en especificaciones verificables;
 - definir el producto, esquema físico, migraciones y operación de la persistencia relacional;
 - definir requisitos no funcionales medibles y fijar mediante benchmarks el presupuesto de nodos.
 
