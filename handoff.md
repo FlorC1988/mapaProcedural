@@ -36,6 +36,11 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Cierre de `PEN-020`: ciclo de vida, identidad, coordenadas axiales, validación, herramientas, listado y concurrencia del editor administrativo de microbiomas.
 - Cierre de `PEN-014` y `PEN-015`: matriz y tabla de recursos, codificación visual de celdas, gimnasios y microbiomas, capa de influencia, inspector, navegación y errores.
 - Cierre de `PEN-016`: requisitos no funcionales aprobados para rendimiento, compatibilidad, accesibilidad, seguridad, privacidad, auditoría, validación, integridad, observabilidad, respaldo, migraciones, pruebas y metodología de benchmark para fijar el presupuesto de nodos.
+- Cierre de `PEN-019`: stack tecnológico aprobado — Supabase autohospedado con Postgres, Node.js/Express backend, React frontend, contenedores Docker propios, driver `pg` directo, migraciones imperativas de Supabase, snapshot JSONB, RLS con rol de servicio y respaldo como responsabilidad de la infraestructura.
+- Auditoría de consistencia documental: detección y cierre de `PEN-021`, `PEN-022` y `PEN-023`, y corrección de textos obsoletos que contradecían decisiones ya aprobadas.
+- Cierre de `PEN-021`: la pieza física no es una entidad persistente independiente; la posición almacena directamente bioma y altura (`DEC-084`).
+- Cierre de `PEN-022`: el contenido exacto de los mensajes de resultado de generación es un detalle de implementación calibrable, debe distinguir las cuatro categorías aprobadas (`DEC-085`).
+- Cierre de `PEN-023`: fórmula estándar de distancia axial hexagonal aprobada y documentada para el radio de influencia de gimnasios (`DEC-086`).
 
 ## Trabajo en curso
 
@@ -44,10 +49,9 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 
 ## Próximos pasos
 
-1. Resolver la tecnología concreta de persistencia, esquema físico, migraciones y despliegue (`PEN-019`) cuando sea el momento adecuado.
-2. Completar la trazabilidad integral y revisar suficiencia de la especificación.
-3. Resolver cualquier decisión nueva descubierta durante la revisión.
-4. Iniciar implementación únicamente con una especificación suficiente y aprobada.
+1. Completar la trazabilidad integral y revisar suficiencia de la especificación.
+2. Resolver cualquier decisión nueva descubierta durante la revisión.
+3. Iniciar implementación únicamente con una especificación suficiente y aprobada.
 
 ## Decisiones
 
@@ -104,11 +108,12 @@ Decisiones rectoras:
 - observabilidad local: logs estructurados y métricas sin contenido sensible;
 - respaldo y migraciones: responsabilidad de la infraestructura, migraciones versionadas hacia adelante;
 - pruebas: pirámide completa con unitarias, integración, contratos, end-to-end y accesibilidad;
-- benchmark de generación: casos de referencia en estación de desarrollo, percentil 99 en 5 s y 30 s.
+- benchmark de generación: casos de referencia en estación de desarrollo, percentil 99 en 5 s y 30 s;
+- pieza física sin entidad independiente, mensajes de resultado de generación como detalle calibrable y fórmula estándar de distancia axial hexagonal para el radio de influencia de gimnasios.
 
 ## Contexto técnico
 
-Está aprobada una base relacional central y compartida como clase de persistencia, con catálogos normalizados y cabecera más snapshot estructurado para mapas. Todavía no hay producto concreto de base de datos, esquema físico, migraciones, lenguaje, framework, arquitectura general ni estrategia de despliegue aprobados. No deben seleccionarse por inferencia.
+Está aprobado el stack tecnológico: **Supabase autohospedado** con Postgres como base relacional, **Node.js/Express** como backend, **React** como frontend, todos desplegados en contenedores Docker en la red privada. El backend se conecta a Postgres mediante el driver `pg` con un rol de servicio; el frontend solo se comunica con el backend. Se habilita RLS en todas las tablas del esquema `public` y solo el rol de servicio del backend tiene permisos. El Data API de Supabase no se expone al cliente.
 
 Cada mapa tiene identidad estable, nombre único, fechas y versión de concurrencia. El contexto histórico del snapshot no cambia con los catálogos operativos y se usa al regenerar. Las actualizaciones desactualizadas se rechazan sin sobrescribir.
 
@@ -130,7 +135,7 @@ Cada gimnasio es una entidad con identidad y uno de 18 tipos fijos. La generaci�
 
 Los biomas tienen identidad, nombre único sin sensibilidad a mayúsculas, color, icono y estado. Solo los activos participan en configuraciones nuevas. Las incompatibilidades son pares simétricos entre biomas distintos.
 
-Los requisitos no funcionales están completos: rendimiento, compatibilidad, accesibilidad, seguridad, privacidad, auditoría, validación, integridad, observabilidad, respaldo, migraciones, pruebas y benchmark. Quedan bajo `PEN-019` el producto concreto de base de datos, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue.
+Los requisitos no funcionales están completos: rendimiento, compatibilidad, accesibilidad, seguridad, privacidad, auditoría, validación, integridad, observabilidad, respaldo, migraciones, pruebas y benchmark. El stack de persistencia y despliegue también está aprobado: Supabase autohospedado, Postgres, Node.js/Express, React, Docker, driver `pg`, migraciones imperativas de Supabase, snapshot JSONB, RLS con rol de servicio y respaldo como responsabilidad de la infraestructura.
 
 Archivos relevantes:
 
@@ -165,18 +170,21 @@ Archivos relevantes:
 - administración de microbiomas propagada; `PEN-020` solo permanece como trazabilidad de una decisión resuelta;
 - recursos y representación visual propagados; `PEN-014` y `PEN-015` solo permanecen como trazabilidad de decisiones resueltas;
 - requisitos no funcionales, seguridad, privacidad, auditoría, observabilidad, respaldo, migraciones, pruebas y benchmark propagados; `PEN-016` solo permanece como trazabilidad de una decisión resuelta;
+- stack tecnológico de persistencia, backend, frontend, despliegue, migraciones y modelo de acceso propagado; `PEN-019` solo permanece como trazabilidad de una decisión resuelta;
+- auditoría de consistencia cruzando identificadores `RF-*`, `RD-*`, `RNF-*`, `CA-*` y `DEC-*` entre todos los documentos: sin huecos de numeración en `DEC-*`, sin `CA-*` duplicados, sin referencias a `DEC-*` inexistentes;
+- textos obsoletos corregidos en `01`, `05`, `06`, `08` y `11` que contradecían decisiones ya aprobadas (persistencia, editor de microbiomas, criterios pendientes);
+- pieza física, mensajes de resultado y fórmula de distancia hexagonal propagados; `PEN-021`, `PEN-022` y `PEN-023` solo permanecen como trazabilidad de decisiones resueltas;
 - no existe código que verificar en esta fase.
 
 ## Problemas conocidos
 
-- El producto, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue de la base relacional no están aprobados (`PEN-019`).
+- No hay decisiones técnicas pendientes del MVP. El valor numérico exacto del presupuesto de nodos se calibrará durante la construcción según `DEC-072`, y el contenido exacto de los mensajes de resultado según `DEC-085`.
 
 ## Deuda técnica
 
 No existe implementación, por lo que todavía no hay deuda técnica de código. Se registra como deuda documental:
 
 - completar trazabilidad integral entre requisitos, reglas y criterios;
-- definir el producto, esquema físico, migraciones y operación de la persistencia relacional (`PEN-019`);
 - calibrar e implementar el benchmark para fijar el presupuesto numérico de nodos durante la construcción.
 
 ## Instrucciones para el siguiente agente

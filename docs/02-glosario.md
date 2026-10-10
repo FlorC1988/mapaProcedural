@@ -16,7 +16,7 @@
 
 **Tipo de gimnasio:** uno de los 18 tipos fijos e inmutables, con una lista configurable de biomas compatibles. Los tipos colocados en una generación son distintos entre sí.
 
-**Área de influencia:** celda del gimnasio y todas las celdas dentro del radio global de distancia hexagonal configurado para la generación.
+**Área de influencia:** celda del gimnasio y todas las celdas dentro del radio global de distancia hexagonal configurado para la generación. La distancia hexagonal se define mediante la fórmula axial de `05-modelo-de-datos.md`.
 
 **Cuadrante:** una de las cuatro regiones iguales obtenidas al dividir por la mitad las filas y columnas visibles del tablero.
 

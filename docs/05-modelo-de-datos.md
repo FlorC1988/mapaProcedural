@@ -2,7 +2,7 @@
 
 ## Estado
 
-Este documento consolida conceptos del borrador y decisiones aprobadas. La tecnología y forma técnica de persistencia están pendientes.
+Este documento consolida conceptos del borrador y decisiones aprobadas. La tecnología y forma técnica de persistencia están aprobadas (sección 9).
 
 ## 1. Posición
 
@@ -43,20 +43,28 @@ fila = r + floor(q / 2) + 1
 
 Esta conversión corresponde a columnas visibles pares desplazadas medio hexágono hacia abajo. Las coordenadas visibles se mantienen dentro de `1..filas` y `1..columnas`; las axiales pueden contener valores negativos de `r` sin quedar fuera del tablero si su conversión visible está dentro de esos límites.
 
+La distancia hexagonal entre dos coordenadas axiales `(q1, r1)` y `(q2, r2)` se calcula como:
+
+```text
+distancia = (|q1 - q2| + |r1 - r2| + |(q1 + r1) - (q2 + r2)|) / 2
+```
+
+Esta es la fórmula estándar de distancia axial en grillas hexagonales y determina la adyacencia (distancia 1) y el área de influencia de los gimnasios según el radio global configurado. Resuelve `DEC-086`.
+
 La edición no admite posiciones vacías. Al ampliar por arriba o por la izquierda, las posiciones existentes cambian sus coordenadas visibles y axiales de acuerdo con el desplazamiento; sus contenidos y asociaciones se conservan.
 
 ## 2. Pieza física
 
-Conceptualmente una pieza:
+La pieza física es un concepto derivado, no una entidad persistente independiente. No existe una tabla ni un registro propio de "Pieza": la Posición almacena directamente su bioma y su altura, y la pieza física se entiende conceptualmente como:
 
 ```text
-Pieza física
+Pieza física (derivada)
 ├── posición ocupada
 ├── altura: Z1 | Z2 | Z3
 └── bioma
 ```
 
-**Pendiente:** decidir si requiere una entidad persistente independiente o si la posición almacena directamente su configuración.
+Esta resolución corresponde a `DEC-084`.
 
 ## 3. Tablero o mapa
 
@@ -187,11 +195,28 @@ La instancia ocupa una sola posición, hereda su altura y conserva su identidad 
 
 ## 9. Persistencia
 
-La persistencia es central y compartida por todos los usuarios de una misma instalación. Utiliza una base relacional con dos modelos complementarios:
+La persistencia es central y compartida por todos los usuarios de una misma instalación. Se implementa sobre **Postgres** proporcionado por una instalación **autohospedada de Supabase** (`supabase/supabase` vía Docker Compose) en la red privada. Los datos se conservan en volúmenes Docker gestionados por el stack de Supabase.
 
-- los catálogos operativos se almacenan como entidades normalizadas con sus relaciones e integridad;
-- cada mapa tiene una cabecera relacional y un snapshot estructurado que agrupa atómicamente su estado actual y su contexto histórico completo.
+El modelo relacional tiene dos partes complementarias:
+
+- los catálogos operativos se almacenan como entidades normalizadas con sus relaciones e integridad referencial;
+- cada mapa tiene una cabecera relacional y un snapshot histórico almacenado como **JSONB**, versionado con el número de versión del algoritmo y del esquema de snapshot.
+
+### Arquitectura de acceso
+
+- El frontend React se comunica únicamente con el backend **Node.js/Express**.
+- El backend se conecta a Postgres mediante un driver directo (`pg` o equivalente) usando un rol de servicio.
+- No se usa el Data API (postgREST) de Supabase ni `@supabase/supabase-js` en el cliente ni en el servidor.
+- Se habilita **RLS** en todas las tablas del esquema `public`; solo el rol de servicio del backend tiene permisos de lectura y escritura. El acceso anónimo al Data API no está permitido.
+
+### Migraciones
+
+Los cambios de esquema y las actualizaciones de la versión del formato de snapshot se gestionan mediante migraciones imperativas de Supabase, creadas con `supabase migration new <nombre>` y aplicadas con el CLI de Supabase. Las migraciones son versionadas y solo hacia adelante.
+
+### Copias de seguridad
+
+Las copias de seguridad son responsabilidad de la infraestructura de cada instalación. Se recomienda `pg_dump` periódico o snapshots de los volúmenes Docker, pero el MVP no implementa un mecanismo automático ni fija RPO/RTO.
+
+### Concurrencia
 
 Guardar una identidad existente compara la versión de concurrencia recibida con la persistida. Si difieren, la actualización se rechaza sin sobrescribir. Si coinciden, el estado, `modificadoEn` y la versión se actualizan en una única operación atómica.
-
-**Pendiente:** producto concreto de base relacional, tipos físicos, esquema detallado, formato y versión técnica del snapshot, migraciones, copias de seguridad y despliegue.

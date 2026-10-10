@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobado, salvo las secciones marcadas como pendientes.
+Aprobado.
 
 ## 1. Objetivo
 

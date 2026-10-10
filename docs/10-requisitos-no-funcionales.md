@@ -43,7 +43,7 @@ Todos los requisitos de este documento están aprobados. El valor numérico del 
 
 - **RNF-CON-001 — Aprobado:** las operaciones de escritura sobre catálogos y mapas deben ser atómicas y dejar el estado consistente ante fallos parciales.
 - **RNF-CON-002 — Aprobado:** el sistema debe mantener la integridad de los snapshots históricos de mapas; los cambios posteriores de catálogos no los alteran.
-- **RNF-CON-003 — Aprobado:** la estrategia de copias de seguridad y recuperación es responsabilidad de la infraestructura de cada instalación; el MVP no define RPO ni RTO.
+- **RNF-CON-003 — Aprobado:** la estrategia de copias de seguridad y recuperación es responsabilidad de la infraestructura de cada instalación; se recomienda `pg_dump` periódico o snapshots de volúmenes Docker, pero el MVP no define RPO ni RTO.
 - **RNF-CON-004 — Aprobado:** las migraciones de esquema y snapshot son versionadas, se ejecutan hacia adelante y deben incluir pruebas de compatibilidad antes de su aplicación.
 
 ## Mantenibilidad y pruebas
@@ -68,4 +68,4 @@ Todos los requisitos de este documento están aprobados. El valor numérico del 
 
 ## Pendientes
 
-No quedan requisitos no funcionales pendientes. La tecnología concreta de persistencia, esquema físico, migraciones y despliegue permanecen bajo `PEN-019`.
+No quedan requisitos no funcionales pendientes. Todas las decisiones de producto, despliegue y operación de persistencia han sido aprobadas.

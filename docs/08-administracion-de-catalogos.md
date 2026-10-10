@@ -2,7 +2,7 @@
 
 ## Estado
 
-Está aprobada la administración de biomas, incompatibilidades y microbiomas, además de la configuración de compatibilidades de tipos fijos de gimnasio. Persisten detalles pendientes indicados en cada sección.
+Está aprobada la administración de biomas, incompatibilidades y microbiomas, además de la configuración de compatibilidades de tipos fijos de gimnasio.
 
 ## 1. Biomas
 
@@ -56,7 +56,7 @@ La interfaz impide guardar un cambio que deje un tipo sin biomas compatibles. Ca
 
 La aplicación no tiene cuentas y el MVP no distingue ni protege al actor administrador. Cualquier usuario de la instalación puede abrir el área administrativa y ejecutar las operaciones de catálogo disponibles.
 
-Esta decisión no convierte en aprobadas las operaciones exactas ni las validaciones todavía pendientes del editor administrativo de microbiomas.
+Las operaciones exactas y las validaciones del editor administrativo de microbiomas están aprobadas en `RF-ADM-009` a `RF-ADM-014` y en `DEC-055` a `DEC-058`.
 
 ## 5. Integridad histórica
 

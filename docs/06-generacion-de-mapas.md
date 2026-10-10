@@ -110,4 +110,4 @@ La búsqueda termina con uno de estos resultados funcionales:
 
 Un error interno se informa por separado y no se clasifica como resultado funcional. Ante cualquier terminación sin éxito, el sistema descarta el candidato parcial y no lo muestra ni lo guarda como mapa.
 
-**Pendiente:** valor numérico del presupuesto y contenido exacto de los mensajes.
+El valor numérico del presupuesto (`DEC-072`) y el contenido exacto de los mensajes de resultado (`DEC-085`) son detalles de implementación calibrables, no decisiones pendientes: se definen durante la construcción respetando las categorías y reglas ya aprobadas.

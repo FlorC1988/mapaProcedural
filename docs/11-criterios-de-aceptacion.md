@@ -596,4 +596,4 @@ Trazabilidad: DEC-071, RNF-MAN-001.
 
 ## Criterios pendientes
 
-El producto y esquema físico de persistencia, los objetivos medibles de accesibilidad, los requisitos restantes de calidad y rendimiento y los detalles técnicos de mensajes y observabilidad requieren decisiones adicionales antes de contar con criterios verificables completos.
+No quedan criterios pendientes de decisión. El producto y esquema físico de persistencia (`DEC-073` a `DEC-083`), los objetivos de accesibilidad (`DEC-065`), los requisitos de calidad y rendimiento (`DEC-063`, `DEC-072`) y la observabilidad (`DEC-070`) están aprobados. El valor numérico del presupuesto de nodos (`DEC-072`) y el contenido exacto de los mensajes de resultado (`DEC-085`) permanecen como detalles de implementación calibrables, verificables una vez redactados mediante pruebas de contrato y end-to-end.

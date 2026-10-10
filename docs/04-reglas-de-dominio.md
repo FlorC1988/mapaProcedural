@@ -87,7 +87,7 @@
 - **RD-GIM-005:** el catálogo fijo contiene Acero, Agua, Bicho, Dragón, Eléctrico, Fantasma, Fuego, Hada, Hielo, Lucha, Normal, Planta, Psíquico, Roca, Siniestro, Tierra, Veneno y Volador.
 - **RD-GIM-006:** dos gimnasios no pueden ser adyacentes, incluso si pertenecen a cuadrantes distintos.
 - **RD-GIM-007:** el usuario configura un radio global entre 0 y 2, predeterminado en 1, medido en distancia hexagonal; radio 0 incluye únicamente la celda del gimnasio.
-- **RD-GIM-008:** el área de influencia incluye la celda ocupada por el gimnasio y todas las celdas cuya distancia hexagonal sea menor o igual al radio.
+- **RD-GIM-008:** el área de influencia incluye la celda ocupada por el gimnasio y todas las celdas cuya distancia hexagonal, calculada mediante la fórmula axial definida en `05-modelo-de-datos.md`, sea menor o igual al radio.
 - **RD-GIM-009:** toda el área de influencia debe permanecer dentro del cuadrante asignado al gimnasio.
 - **RD-GIM-010:** las áreas de influencia de dos gimnasios no pueden superponerse.
 - **RD-GIM-011:** cada celda del área recibe aleatoriamente uno de los biomas compatibles configurados directamente en el tipo de gimnasio; inicialmente los cinco biomas son compatibles con todos los tipos y ninguna lista puede quedar vacía.
