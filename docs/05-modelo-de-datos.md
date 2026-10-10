@@ -43,7 +43,7 @@ fila = r + floor(q / 2) + 1
 
 Esta conversión corresponde a columnas visibles pares desplazadas medio hexágono hacia abajo. Las coordenadas visibles se mantienen dentro de `1..filas` y `1..columnas`; las axiales pueden contener valores negativos de `r` sin quedar fuera del tablero si su conversión visible está dentro de esos límites.
 
-**Pendiente:** representación de una posición vacía.
+La edición no admite posiciones vacías. Al ampliar por arriba o por la izquierda, las posiciones existentes cambian sus coordenadas visibles y axiales de acuerdo con el desplazamiento; sus contenidos y asociaciones se conservan.
 
 ## 2. Pieza física
 
@@ -120,14 +120,21 @@ Datos confirmados:
 
 ```text
 Microbioma
+├── identidad estable
+├── nombre único
 ├── activo : boolean
-└── celdas
-    ├── posición relativa
-    ├── bioma
-    └── altura
+├── versión de concurrencia
+└── celdas[1..900]
+    ├── coordenada axial relativa (dq, dr)
+    ├── bioma activo
+    └── altura Z1 | Z2 | Z3
 ```
 
-Solo los microbiomas activos participan en generación. Los inactivos permanecen almacenados.
+El nombre se recorta en sus extremos, contiene entre 1 y 100 caracteres y es único sin distinguir mayúsculas. La celda `(0,0)` es el ancla. Las coordenadas no se repiten, la forma está conectada por lados y su extensión no supera el equivalente visible de 30×30. Reanclar selecciona otra celda, la convierte en `(0,0)` y recalcula todos los offsets sin cambiar la forma.
+
+Para medir la extensión, el ancho es `max(dq) - min(dq) + 1`. Para cada paridad posible `p ∈ {0, 1}` de la columna axial del ancla, el offset de fila visible de una celda es `dr + floor((p + dq) / 2) - floor(p / 2)`; su rango `máximo - mínimo + 1` no puede superar 30 para ninguna de las dos paridades. El ancho tampoco puede superar 30.
+
+Solo los microbiomas activos participan en generación. Los inactivos permanecen almacenados y no se eliminan físicamente. Toda definición persistida es estructuralmente válida; una nueva se crea activa.
 
 Cada colocación se representa separadamente:
 
@@ -139,9 +146,11 @@ InstanciaMicrobioma
 └── posiciones asociadas[]
 ```
 
-La instancia permite reconocer relaciones internas y cambios de bioma causados por gimnasios sin modificar la definición. Si el usuario edita manualmente una de sus celdas, se elimina la asociación de la instancia completa y sus celdas conservan los valores actuales.
+La instancia permite reconocer relaciones internas y cambios de bioma causados por gimnasios sin modificar su copia histórica de la definición. Editar, activar o desactivar el registro operativo de origen no cambia instancias ni snapshots existentes. Si el usuario edita manualmente una de sus celdas, se elimina la asociación de la instancia completa y sus celdas conservan los valores actuales.
 
-**Pendiente:** identidad y nombre de la definición, anclaje, formato de posiciones relativas, dimensiones y persistencia concreta.
+En el editor, estampar una definición activa crea una identidad de instancia y asocia todas sus posiciones. Antes de sobrescribir bioma y altura se desvincula por completo cada instancia intersectada. Los gimnasios permanecen asociados a sus posiciones. Mover una instancia desvincula primero el origen y crea la colocación en la nueva ancla.
+
+Guardar una edición compara la versión abierta con la persistida. Una diferencia rechaza la actualización sin sobrescribir; una actualización correcta incrementa la versión.
 
 ## 6. Cuadrante
 
@@ -171,10 +180,10 @@ Gimnasio
 ├── tipo
 ├── posición
 ├── cuadrante
-└── área de influencia[]
+└── área de influencia[] : opcional
 ```
 
-La instancia ocupa una sola posición, hereda su altura y conserva su identidad y tipo. El área de influencia se calcula con el radio global de la generación e incluye la posición del gimnasio.
+La instancia ocupa una sola posición, hereda su altura y conserva su identidad y tipo. Durante la generación, el área de influencia se calcula con el radio global e incluye la posición del gimnasio. Agregar, mover o cambiar el tipo en edición manual elimina esa asociación sin cambiar ningún bioma; una instancia creada manualmente no tiene área asociada.
 
 ## 9. Persistencia
 

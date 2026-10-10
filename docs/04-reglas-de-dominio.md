@@ -19,6 +19,8 @@
 - **RD-TAB-008:** el desplazamiento geométrico no agrega ni elimina posiciones ni altera la definición de adyacencia.
 - **RD-TAB-009:** filas y columnas deben ser pares para dividir el tablero en cuatro cuadrantes iguales.
 - **RD-TAB-010:** los cuadrantes se forman dividiendo por la mitad los índices visibles de filas y columnas; cada cuadrante contiene `(F / 2) × (C / 2)` posiciones.
+- **RD-TAB-011:** la edición manual no puede dejar una posición vacía.
+- **RD-TAB-012:** un mapa editado puede ampliarse por cualquiera de sus bordes sin recortarse; la suma agregada al eje vertical y al horizontal debe ser par y las dimensiones resultantes permanecen entre 8 y 30.
 
 ## 3. Adyacencia
 
@@ -61,7 +63,7 @@
 ## 7. Microbiomas
 
 - **RD-MIC-001:** una definición de microbioma establece posiciones relativas, bioma y altura de cada posición.
-- **RD-MIC-002:** la definición es invariable, fija y no parametrizable ni aleatoria; una instancia colocada conserva referencia a ella y puede recibir cambios de bioma causados por gimnasios.
+- **RD-MIC-002:** la distribución seleccionada para una instancia es fija, no parametrizable ni aleatoria; la instancia conserva una copia histórica de la definición usada y puede recibir cambios de bioma causados por gimnasios.
 - **RD-MIC-003:** durante la colocación no puede rotarse ni reflejarse. Su bioma solo puede modificarse posteriormente por la influencia prioritaria de un gimnasio, sin alterar altura ni pertenencia.
 - **RD-MIC-004:** las relaciones internas de una instancia quedan exentas de restricciones generales de altura e incompatibilidad, incluso después de cambios de bioma causados por un gimnasio.
 - **RD-MIC-005:** sus relaciones con piezas externas deben respetar las reglas generales.
@@ -69,6 +71,12 @@
 - **RD-MIC-007:** un microbioma no puede salir del tablero ni superponerse con otro.
 - **RD-MIC-008:** su colocación no puede impedir una configuración válida del resto del mapa.
 - **RD-MIC-009:** el usuario solicita entre 0 y 10 microbiomas, con valor predeterminado 2.
+- **RD-MIC-010:** en edición manual, estampar una definición activa crea una instancia completa sin rotación ni reflexión, reemplaza bioma y altura, conserva gimnasios y desvincula por completo cualquier instancia intersectada.
+- **RD-MIC-011:** mover una instancia desvincula primero su ubicación anterior conservando los valores de sus celdas y luego aplica el estampado en la nueva ancla.
+- **RD-MIC-012:** una definición guardada contiene entre 1 y 900 celdas con coordenadas axiales relativas únicas, incluye el ancla `(0,0)` y no supera una extensión equivalente a 30×30 posiciones visibles para ninguna de las dos paridades posibles de la columna del ancla.
+- **RD-MIC-013:** todas sus celdas forman un único conjunto conectado mediante adyacencias por lado.
+- **RD-MIC-014:** cada celda usa un bioma activo y una altura Z1, Z2 o Z3; las incompatibilidades y diferencias de altura internas no invalidan una definición.
+- **RD-MIC-015:** activar, desactivar o editar una definición operativa solo afecta selecciones e instancias creadas posteriormente; las instancias y snapshots existentes conservan su copia histórica.
 
 ## 8. Gimnasios
 
@@ -87,6 +95,8 @@
 - **RD-GIM-013:** la influencia no cambia alturas; solo cambia biomas.
 - **RD-GIM-014:** la influencia puede modificar biomas de un microbioma sin desvincularlo. Sus alturas, identidad, pertenencia y excepciones internas se conservan.
 - **RD-GIM-015:** la representación visual del gimnasio tiene prioridad sobre la del bioma de su celda.
+- **RD-GIM-016:** agregar, mover o cambiar el tipo de un gimnasio durante la edición manual no modifica biomas y deja la instancia sin área de influencia asociada; quitarlo elimina solo la instancia. Las celdas de origen o destino asociadas a microbiomas aplican la desvinculación completa de la instancia.
+- **RD-GIM-017:** las restricciones de tipos distintos, adyacencia, cuadrante y áreas pertenecen a la generación y no limitan la edición manual de gimnasios.
 
 ## 9. Recursos físicos
 

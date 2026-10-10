@@ -45,25 +45,29 @@ Eliminar abre una confirmación simple que muestra el nombre y ofrece Cancelar o
 ## 3. Flujo de edición
 
 1. El usuario abre un mapa generado o guardado.
-2. Realiza una modificación sobre una propiedad editable; para bioma solo puede seleccionar uno activo.
-3. El sistema aplica el cambio sin evaluar las restricciones de generación.
-4. Si la celda pertenecía a un microbioma, desvincula primero la instancia completa y conserva los valores actuales de todas sus celdas.
-5. El sistema recalcula la matriz de recursos para reflejar el mapa actual.
-6. El usuario puede guardar el mapa sin validación ni estado válido o inválido.
+2. Elige cambiar bioma o altura, editar un gimnasio, estampar, mover o desvincular un microbioma, o ampliar el tablero.
+3. Para biomas y relleno de expansión solo puede seleccionar uno activo; ninguna operación deja posiciones vacías.
+4. El sistema aplica la operación completa sin evaluar las restricciones de generación.
+5. Si una celda editada pertenecía a un microbioma, desvincula primero la instancia completa y conserva los valores actuales de sus celdas.
+6. El sistema recalcula la matriz de recursos.
+7. La operación se incorpora al historial de sesión y puede deshacerse o rehacerse.
+8. El usuario puede guardar el mapa sin validación ni estado válido o inválido mediante el flujo aprobado de guardado y concurrencia.
 
-Solicitar una nueva generación crea otro mapa desde la configuración e ignora las ediciones del mapa anterior.
+Editar un gimnasio permite agregar, quitar, mover o cambiar tipo sin aplicar influencia. Estampar un microbioma exige seleccionar una definición activa y un ancla válida. Ampliar exige indicar cantidades por borde, con sumas pares, dimensiones finales `8..30`, un bioma activo y una altura para las celdas nuevas.
 
-**Pendiente:** herramientas, selección de propiedades editables, deshacer y comportamiento exacto de guardado.
+Solicitar una nueva generación crea otro mapa desde la configuración actualizada y el contexto histórico, e ignora las ediciones del mapa anterior. Cerrar o recargar limpia el historial de deshacer y rehacer.
 
 ## 4. Flujos de catálogos
 
-El administrador gestiona biomas, incompatibilidades y microbiomas. Para cada bioma configura nombre único, color, icono y estado. Las incompatibilidades se presentan como relaciones simétricas y no permiten seleccionar el mismo bioma en ambos extremos.
+El área administrativa no requiere autenticación ni autorización; cualquier usuario de la instalación puede abrirla. Desde ella se gestionan biomas, incompatibilidades y microbiomas. Para cada bioma se configura nombre único, color, icono y estado. Las incompatibilidades se presentan como relaciones simétricas y no permiten seleccionar el mismo bioma en ambos extremos.
 
 La interfaz bloquea la desactivación de un bioma con dependencias activas e informa la causa. No ofrece eliminación física de biomas.
 
 Cualquier usuario puede configurar los biomas compatibles de los 18 tipos fijos de gimnasio. La interfaz no permite crear, eliminar, activar o desactivar tipos. Inicialmente todos admiten los cinco biomas.
 
-**Pendiente:** navegación, acceso, formularios, validaciones y operaciones exactas.
+El listado de microbiomas muestra nombre, estado y cantidad de celdas, con búsqueda parcial, filtro por estado y orden por nombre. Crear abre el editor con una celda ancla; Guardar crea la definición activa cuando nombre, forma, biomas y alturas cumplen todas las validaciones.
+
+Al editar, el usuario agrega celdas adyacentes, elimina sin desconectar, reancla o aplica bioma y altura a una celda o selección. Guardar rechaza errores estructurales, nombres duplicados y conflictos de versión. Activar o desactivar se aplica inmediatamente desde el listado o detalle y solo afecta usos futuros.
 
 ## 5. Representación del tablero
 

@@ -60,6 +60,4 @@ El mapa base contiene bioma, altura y pertenencia eventual a un microbioma. Los 
 ## 5. Actores
 
 - **Usuario:** genera, visualiza, guarda y edita mapas, y configura compatibilidades de tipos fijos de gimnasio, sin iniciar sesión.
-- **Administrador:** gestiona los catálogos de biomas, incompatibilidades y microbiomas.
-
-**Pendiente:** mecanismo para distinguir o proteger al administrador en una aplicación sin cuentas.
+- **Administrador:** rol funcional asumido por cualquier usuario que accede al área administrativa para gestionar los catálogos de biomas, incompatibilidades y microbiomas. En el MVP no se distingue ni protege este acceso.

@@ -292,6 +292,108 @@ Al editar el bioma de una celda, solo se ofrecen biomas activos; un bioma histó
 
 Trazabilidad: DEC-034, RF-EDI-007.
 
+### CA-EDI-006 — Propiedades y ocupación
+
+El editor permite cambiar bioma y altura, editar gimnasios y gestionar instancias de microbioma, pero ninguna operación permite dejar una posición sin bioma o altura.
+
+Trazabilidad: DEC-049, RF-EDI-002, RF-EDI-008.
+
+### CA-EDI-007 — Gimnasio sin influencia
+
+Al agregar, mover o cambiar el tipo de un gimnasio, ningún bioma cambia y la instancia queda sin área asociada; quitarlo conserva el bioma y la altura de su posición. Si una celda de origen o destino pertenecía a un microbioma, su instancia completa queda desvinculada.
+
+Trazabilidad: DEC-016, DEC-050, RF-EDI-004, RF-EDI-009, RD-GIM-016.
+
+### CA-EDI-008 — Estampado de microbioma
+
+Al estampar una definición activa que cabe completa, el sistema crea una instancia sin rotación ni reflexión, desvincula las instancias intersectadas, reemplaza bioma y altura y conserva los gimnasios de las celdas ocupadas.
+
+Trazabilidad: DEC-051, RF-EDI-010, RD-MIC-010.
+
+### CA-EDI-009 — Movimiento de microbioma
+
+Al mover una instancia, sus celdas de origen quedan desvinculadas y conservan sus valores; la definición se estampa completa desde la nueva ancla.
+
+Trazabilidad: DEC-051, RF-EDI-011, RD-MIC-011.
+
+### CA-EDI-010 — Expansión por bordes
+
+La interfaz solo permite agregar cantidades no negativas por borde cuando las sumas vertical y horizontal son pares y las dimensiones resultantes permanecen entre 8 y 30. Las celdas nuevas reciben el bioma activo y la altura elegidos.
+
+Trazabilidad: DEC-052, RF-EDI-012, RD-TAB-012.
+
+### CA-EDI-011 — Coordenadas y configuración tras expansión
+
+Al agregar arriba o a la izquierda, las coordenadas de las posiciones existentes se desplazan sin cambiar contenidos ni asociaciones, y la configuración adopta las nuevas filas y columnas para regeneraciones posteriores.
+
+Trazabilidad: DEC-052, RF-EDI-012.
+
+### CA-EDI-012 — Historial de sesión
+
+Durante una sesión pueden deshacerse y rehacerse múltiples operaciones completas. Una nueva edición después de deshacer elimina la rama de rehacer; cerrar o recargar elimina el historial.
+
+Trazabilidad: DEC-053, RF-EDI-013.
+
+### CA-EDI-013 — Recursos tras historial
+
+Después de deshacer o rehacer, la matriz de recursos coincide con los biomas y alturas resultantes.
+
+Trazabilidad: DEC-053, RF-REC-004.
+
+### CA-ADM-001 — Acceso administrativo abierto
+
+Cualquier usuario de la instalación puede abrir el área administrativa y ejecutar las operaciones disponibles sin autenticación ni autorización.
+
+Trazabilidad: DEC-054, RF-ADM-005.
+
+### CA-ADM-002 — Ciclo de vida de microbiomas
+
+La interfaz permite crear, consultar, editar, activar y desactivar definiciones, no ofrece eliminación física y crea activa toda definición nueva guardada correctamente.
+
+Trazabilidad: DEC-055, RF-ADM-003, RF-ADM-004.
+
+### CA-ADM-003 — Nombre de microbioma
+
+Guardar recorta los espacios exteriores y acepta únicamente un nombre de 1 a 100 caracteres que no coincida, sin distinguir mayúsculas, con otra definición.
+
+Trazabilidad: DEC-055, RF-ADM-004.
+
+### CA-ADM-004 — Estructura de microbioma
+
+Guardar exige una celda ancla `(0,0)`, entre 1 y 900 coordenadas axiales relativas únicas, extensión máxima equivalente a 30×30 posiciones visibles y una forma completamente conectada por lados.
+
+Trazabilidad: DEC-056, RF-ADM-009, RD-MIC-012, RD-MIC-013.
+
+### CA-ADM-005 — Contenido de celdas
+
+Cada celda guardada tiene un bioma activo y una altura Z1, Z2 o Z3. Las incompatibilidades y diferencias de altura entre celdas internas no bloquean el guardado.
+
+Trazabilidad: DEC-056, RF-ADM-010, RD-MIC-014.
+
+### CA-ADM-006 — Herramientas de forma
+
+El editor comienza con el ancla, solo agrega celdas adyacentes y solo elimina cuando permanece al menos una celda y la forma sigue conectada. Reanclar conserva la forma y recalcula los offsets respecto de la nueva `(0,0)`.
+
+Trazabilidad: DEC-057, RF-ADM-011.
+
+### CA-ADM-007 — Edición de contenido
+
+El usuario puede seleccionar una o varias celdas y aplicarles un bioma activo, una altura o ambos valores antes de guardar.
+
+Trazabilidad: DEC-057, RF-ADM-011.
+
+### CA-ADM-008 — Listado de microbiomas
+
+El listado muestra nombre, estado y cantidad de celdas, permite búsqueda parcial por nombre sin distinguir mayúsculas, filtro activo/inactivo y orden por nombre.
+
+Trazabilidad: DEC-057, RF-ADM-012.
+
+### CA-ADM-009 — Estado, historial y concurrencia
+
+Editar, activar o desactivar una definición afecta inmediatamente solo usos futuros y no cambia instancias ni snapshots existentes. Si la versión persistida cambió desde que se abrió, Guardar rechaza la actualización sin sobrescribir.
+
+Trazabilidad: DEC-058, RF-ADM-013, RF-ADM-014, RD-MIC-015.
+
 ### CA-MAP-001 — Configuración conservada
 
 Al guardar y abrir un mapa, se conservan filas, columnas, microbiomas solicitados, `N`, radio y semilla.
@@ -348,4 +450,4 @@ Trazabilidad: DEC-047, RF-MAP-011, RD-REG-007.
 
 ## Criterios pendientes
 
-El producto y esquema físico de persistencia, las propiedades y herramientas exactas de edición, los detalles restantes de administración, los mensajes exactos de generación, la accesibilidad y el rendimiento requieren decisiones adicionales antes de contar con criterios verificables completos.
+El producto y esquema físico de persistencia, el desglose de recursos, la representación visual, los mensajes exactos de generación, la accesibilidad y el rendimiento requieren decisiones adicionales antes de contar con criterios verificables completos.

@@ -32,6 +32,8 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Cierre de `PEN-001` y `PEN-018`: límites, valores predeterminados, compatibilidades no vacías y validación previa.
 - Cierre de `PEN-005`, `PEN-006` y `PEN-007`: backtracking global con MRV y propagación, presupuesto determinista por asignaciones, resultados diferenciados, descarte de parciales y semilla visible y editable.
 - Cierre de `PEN-008`, `PEN-009` y `PEN-013`: persistencia relacional compartida, cabecera y snapshot, identidad y nombres de mapa, operaciones, listado, concurrencia optimista e integridad histórica.
+- Cierre de `PEN-010` y `PEN-012`: herramientas completas de edición, expansión, historial de sesión y acceso administrativo abierto sin autenticación ni autorización.
+- Cierre de `PEN-020`: ciclo de vida, identidad, coordenadas axiales, validación, herramientas, listado y concurrencia del editor administrativo de microbiomas.
 
 ## Trabajo en curso
 
@@ -41,11 +43,11 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 ## Próximos pasos
 
 1. Presentar y resolver las decisiones pendientes por bloques, sin inferir respuestas.
-2. Resolver a continuación edición (`PEN-010`) y administración (`PEN-012`).
-3. Resolver recursos y representación visual (`PEN-014`, `PEN-015`).
-4. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
-5. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
-6. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
+2. Resolver recursos y representación visual (`PEN-014`, `PEN-015`).
+3. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
+4. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
+5. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
+6. Completar la trazabilidad integral y revisar suficiencia de la especificación.
 7. Iniciar implementación únicamente con una especificación suficiente y aprobada.
 
 ## Decisiones
@@ -82,13 +84,25 @@ Decisiones rectoras:
 - mapas con identidad estable, nombre único de 1..100 caracteres, fechas y versión de concurrencia;
 - Guardar, Guardar como, Duplicar, listado con búsqueda y orden, y eliminación definitiva confirmada;
 - snapshots históricos aislados de cambios de catálogo y usados para regenerar mapas guardados;
-- rechazo de actualizaciones desactualizadas mediante concurrencia optimista.
+- rechazo de actualizaciones desactualizadas mediante concurrencia optimista;
+- edición de bioma, altura, gimnasios e instancias de microbioma sin posiciones vacías;
+- gimnasios editados sin reaplicar influencia y microbiomas estampados desde definiciones activas;
+- expansión por bordes con dimensiones pares y actualización de la configuración;
+- historial múltiple de deshacer y rehacer limitado a la sesión;
+- área administrativa abierta a cualquier usuario, sin autenticación ni autorización;
+- definiciones de microbioma identificables, sin eliminación física, siempre válidas y nuevas activas;
+- formas axiales conectadas de 1..900 celdas, con ancla, biomas activos y extensión máxima equivalente a 30×30;
+- editor administrativo con adición adyacente, eliminación conectada, reanclaje, selección múltiple, listado y concurrencia optimista.
 
 ## Contexto técnico
 
 Está aprobada una base relacional central y compartida como clase de persistencia, con catálogos normalizados y cabecera más snapshot estructurado para mapas. Todavía no hay producto concreto de base de datos, esquema físico, migraciones, lenguaje, framework, arquitectura general ni estrategia de despliegue aprobados. No deben seleccionarse por inferencia.
 
 Cada mapa tiene identidad estable, nombre único, fechas y versión de concurrencia. El contexto histórico del snapshot no cambia con los catálogos operativos y se usa al regenerar. Las actualizaciones desactualizadas se rechazan sin sobrescribir.
+
+El editor no admite posiciones vacías. Permite modificar bioma, altura, gimnasios e instancias de microbioma, ampliar por bordes y deshacer o rehacer durante la sesión. Editar gimnasios no reaplica influencia; estampar microbiomas sobrescribe bioma y altura y conserva gimnasios.
+
+El área administrativa no tiene protección en el MVP y está disponible para cualquier usuario de la instalación. Las definiciones de microbioma tienen identidad, nombre único, estado y versión; usan coordenadas axiales relativas conectadas respecto de un ancla y solo se guardan si cumplen todas las validaciones. No se eliminan físicamente y las nuevas se crean activas.
 
 El generador usa backtracking global entre las fases aprobadas, MRV y propagación de restricciones. Cada alternativa intentada consume un nodo de un presupuesto global determinista cuyo valor se fijará tras benchmarks. Agotar el espacio demuestra ausencia de solución; agotar el presupuesto no. Los candidatos parciales se descartan.
 
@@ -130,12 +144,12 @@ Archivos relevantes:
 - límites y valores predeterminados propagados de forma consistente; `PEN-001` y `PEN-018` solo permanecen como trazabilidad de decisiones resueltas;
 - algoritmo, búsqueda, fallos y semilla propagados; `PEN-005`, `PEN-006` y `PEN-007` solo permanecen como trazabilidad de decisiones resueltas;
 - persistencia, mapas guardados e integridad histórica propagados; `PEN-008`, `PEN-009` y `PEN-013` solo permanecen como trazabilidad de decisiones resueltas;
+- herramientas de edición y acceso administrativo propagados; `PEN-010` y `PEN-012` solo permanecen como trazabilidad de decisiones resueltas;
+- administración de microbiomas propagada; `PEN-020` solo permanece como trazabilidad de una decisión resuelta;
 - no existe código que verificar en esta fase.
 
 ## Problemas conocidos
 
-- El actor administrador no tiene un mecanismo de acceso aprobado.
-- Las propiedades y herramientas exactas de edición todavía no están definidas.
 - El producto, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue de la base relacional no están aprobados.
 - El valor numérico del presupuesto de nodos depende de benchmarks y requisitos de rendimiento aún no aprobados.
 
@@ -144,7 +158,7 @@ Archivos relevantes:
 No existe implementación, por lo que todavía no hay deuda técnica de código. Se registra como deuda documental:
 
 - completar trazabilidad integral entre requisitos, reglas y criterios;
-- convertir decisiones pendientes en especificaciones verificables;
+- convertir las decisiones pendientes de recursos, representación y calidad en especificaciones verificables;
 - definir el producto, esquema físico, migraciones y operación de la persistencia relacional;
 - definir requisitos no funcionales medibles y fijar mediante benchmarks el presupuesto de nodos.
 

@@ -23,18 +23,26 @@ La desactivación se bloquea si el bioma está utilizado por un microbioma activ
 
 ## 2. Microbiomas
 
-El administrador podrá gestionar microbiomas. Cada definición debe expresar posiciones relativas con bioma y altura. La generación solo utiliza microbiomas activos y conserva los inactivos almacenados.
+Cualquier usuario puede crear, consultar, editar, activar y desactivar definiciones; no existe eliminación física. Cada definición tiene identidad estable, nombre único sin distinguir mayúsculas, estado y versión de concurrencia. El nombre se recorta y contiene entre 1 y 100 caracteres. Una definición nueva válida se crea activa.
 
-**Pendiente:**
+Cada celda usa coordenadas axiales relativas `(dq, dr)`, un bioma activo y una altura Z1, Z2 o Z3. La definición incluye una única celda `(0,0)` como ancla, contiene entre 1 y 900 coordenadas únicas, forma un conjunto conectado por lados y no supera una extensión equivalente a 30×30 posiciones visibles. Las excepciones internas permiten cualquier combinación de biomas y alturas admitidos sin validar incompatibilidades ni diferencias de nivel.
 
-- operaciones administrativas exactas;
-- interfaz de edición;
-- validación estructural antes de activar;
-- formato de coordenadas relativas.
+El editor:
 
-Los cambios de una definición no alteran las copias históricas conservadas dentro de mapas existentes.
+1. inicia una definición con su ancla;
+2. permite agregar únicamente celdas adyacentes;
+3. solo elimina una celda si la forma restante continúa conectada y conserva al menos una;
+4. permite seleccionar otra celda como ancla y recalcula todos los offsets;
+5. permite editar bioma y altura en una celda o selección múltiple;
+6. bloquea Guardar ante cualquier incumplimiento estructural o nombre duplicado.
 
-Un microbioma nuevo solo puede utilizar biomas activos. La administración de definiciones no cambia la regla de generación: una vez seleccionado, un microbioma no se rota ni refleja; sus biomas solo pueden alterarse por la influencia prioritaria aprobada de un gimnasio.
+El listado muestra nombre, estado y cantidad de celdas. Permite búsqueda parcial por nombre sin distinguir mayúsculas, filtro activo/inactivo y orden por nombre.
+
+Editar una definición activa válida afecta generaciones futuras inmediatamente. Activar o desactivar también tiene efecto inmediato y no requiere confirmación. Los cambios nunca alteran instancias ni snapshots existentes.
+
+Guardar usa control optimista: si la versión persistida cambió desde que se abrió el editor, rechaza la actualización sin sobrescribir y exige recargar.
+
+La administración de definiciones no cambia la regla de generación: una vez seleccionada para una instancia, la distribución no se rota ni refleja; sus biomas solo pueden alterarse por la influencia prioritaria aprobada de un gimnasio.
 
 ## 3. Tipos de gimnasio
 
@@ -46,9 +54,9 @@ La interfaz impide guardar un cambio que deje un tipo sin biomas compatibles. Ca
 
 ## 4. Acceso administrativo
 
-La aplicación no tendrá cuentas de usuario, pero existe un actor administrador.
+La aplicación no tiene cuentas y el MVP no distingue ni protege al actor administrador. Cualquier usuario de la instalación puede abrir el área administrativa y ejecutar las operaciones de catálogo disponibles.
 
-**Pendiente crítico:** aprobar cómo se distingue o protege el acceso administrativo. No se implementará un mecanismo por inferencia.
+Esta decisión no convierte en aprobadas las operaciones exactas ni las validaciones todavía pendientes del editor administrativo de microbiomas.
 
 ## 5. Integridad histórica
 

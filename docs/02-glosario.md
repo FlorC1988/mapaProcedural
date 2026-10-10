@@ -34,7 +34,7 @@
 
 **Mapa base:** bioma, altura y eventual pertenencia a un microbioma de las posiciones, antes de colocar gimnasios y aplicar sus áreas de influencia.
 
-**Definición de microbioma:** estructura predefinida e invariable que asigna bioma y altura a posiciones relativas.
+**Definición de microbioma:** entidad identificable y administrable que asigna bioma y altura a una forma conectada de posiciones axiales relativas respecto de un ancla. Una instancia colocada no cambia cuando posteriormente se edita la definición.
 
 **Instancia de microbioma:** colocación identificable de una definición. Puede recibir cambios de bioma causados por gimnasios sin modificar la definición ni perder sus excepciones internas.
 
@@ -50,6 +50,4 @@
 
 **Preferencia blanda:** objetivo deseable que no determina la validez. No se utiliza en la primera versión.
 
-## Términos pendientes
-
-**Administrador:** actor que gestiona catálogos. Su mecanismo de acceso o protección está pendiente.
+**Administrador:** rol funcional de quien utiliza el área administrativa para gestionar catálogos. En el MVP cualquier usuario de la instalación puede asumirlo sin autenticación ni autorización.

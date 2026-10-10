@@ -51,12 +51,18 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 ## Edición
 
 - **RF-EDI-001 — Aprobado:** el usuario podrá editar manualmente un mapa generado.
-- **RF-EDI-002 — Pendiente:** propiedades concretas editables.
+- **RF-EDI-002 — Aprobado:** el editor permitirá cambiar bioma y altura; agregar, quitar, mover y cambiar el tipo de gimnasios; y estampar, mover o desvincular instancias de microbioma.
 - **RF-EDI-007 — Aprobado:** si se edita el bioma, solo podrán seleccionarse biomas activos.
 - **RF-EDI-003 — Aprobado:** las ediciones no estarán sujetas a las restricciones de generación, no se rechazarán por ellas ni producirán errores de validez.
 - **RF-EDI-004 — Aprobado:** editar una celda de microbioma desvinculará la instancia completa y conservará los valores actuales de sus celdas.
 - **RF-EDI-005 — Aprobado:** guardar y abrir mapas editados no ejecutará validación ni les asignará un estado válido o inválido.
 - **RF-EDI-006 — Aprobado:** solicitar una nueva generación desde un mapa editado creará un mapa nuevo e ignorará las ediciones anteriores.
+- **RF-EDI-008 — Aprobado:** ninguna herramienta de edición permitirá dejar una posición vacía.
+- **RF-EDI-009 — Aprobado:** editar un gimnasio no aplicará influencia ni cambiará biomas; agregarlo, moverlo o cambiar su tipo eliminará su área asociada, y quitarlo eliminará solo la entidad. Las celdas de origen o destino pertenecientes a microbiomas aplicarán la desvinculación de RF-EDI-004.
+- **RF-EDI-010 — Aprobado:** estampar un microbioma activo exigirá que quepa completo, sobrescribirá bioma y altura sin rotar ni reflejar, conservará gimnasios y desvinculará instancias intersectadas.
+- **RF-EDI-011 — Aprobado:** mover un microbioma desvinculará su ubicación anterior conservando sus valores y lo estampará desde la nueva ancla.
+- **RF-EDI-012 — Aprobado:** el tablero podrá ampliarse por sus bordes sin recortarse, manteniendo dimensiones pares entre 8 y 30; las celdas nuevas recibirán el bioma activo y la altura elegidos y la configuración adoptará las nuevas dimensiones.
+- **RF-EDI-013 — Aprobado:** el editor mantendrá durante la sesión un historial de múltiples operaciones para deshacer y rehacer; una nueva edición tras deshacer descartará la rama de rehacer y cerrar o recargar limpiará el historial.
 
 ## Catálogos y administración
 
@@ -66,10 +72,16 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 - **RF-ADM-002 — Aprobado:** un administrador podrá gestionar incompatibilidades simétricas entre biomas distintos.
 - **RF-ADM-007 — Aprobado:** el sistema rechazará nombres de bioma duplicados sin distinguir mayúsculas y minúsculas.
 - **RF-ADM-008 — Aprobado:** el sistema bloqueará la desactivación de un bioma usado por un microbioma activo o configurado como compatible en un tipo de gimnasio.
-- **RF-ADM-003 — Aprobado:** un administrador podrá gestionar microbiomas.
-- **RF-ADM-004 — Pendiente:** operaciones exactas disponibles para cada catálogo.
-- **RF-ADM-005 — Pendiente:** protección del acceso administrativo.
+- **RF-ADM-003 — Aprobado:** un administrador podrá crear, consultar, editar, activar y desactivar definiciones de microbioma; no podrá eliminarlas físicamente.
+- **RF-ADM-004 — Aprobado:** cada definición tendrá identidad estable, nombre obligatorio único sin distinguir mayúsculas de 1 a 100 caracteres, estado y versión de concurrencia; una definición nueva válida se creará activa.
+- **RF-ADM-005 — Aprobado:** el MVP no protegerá ni distinguirá el acceso administrativo; cualquier usuario de la instalación podrá abrir el área administrativa.
 - **RF-ADM-006 — Aprobado:** modificar o desactivar datos de catálogo no alterará el contenido ni el contexto histórico de mapas guardados existentes.
+- **RF-ADM-009 — Aprobado:** toda definición guardada tendrá ancla axial `(0,0)`, entre 1 y 900 celdas con coordenadas relativas únicas, extensión máxima equivalente a 30×30 posiciones visibles y una forma conectada por lados.
+- **RF-ADM-010 — Aprobado:** cada celda de definición tendrá un bioma activo y una altura Z1, Z2 o Z3; no se validarán incompatibilidades ni diferencias de altura entre celdas internas.
+- **RF-ADM-011 — Aprobado:** el editor solo agregará celdas adyacentes y solo permitirá eliminarlas si la forma continúa conectada; podrá reanclar y editar bioma o altura por celda o selección múltiple.
+- **RF-ADM-012 — Aprobado:** el listado mostrará nombre, estado y cantidad de celdas, permitirá búsqueda parcial por nombre, filtro activo/inactivo y orden por nombre.
+- **RF-ADM-013 — Aprobado:** activar o desactivar tendrá efecto inmediato solo en selecciones y generaciones futuras; editar una definición activa no alterará snapshots existentes.
+- **RF-ADM-014 — Aprobado:** Guardar rechazará una definición inválida y también una actualización cuya versión persistida haya cambiado desde que se abrió, sin sobrescribir.
 
 ## Autenticación
 

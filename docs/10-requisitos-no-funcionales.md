@@ -28,7 +28,7 @@ No se han aprobado objetivos no funcionales concretos. Este documento enumera de
 
 ### Seguridad
 
-- protección del área administrativa;
+- riesgos y medidas compensatorias derivados de un área administrativa sin autenticación ni autorización en el MVP;
 - validación de entradas;
 - producto de base relacional, credenciales, aislamiento de red y despliegue;
 - registro de acciones administrativas.
