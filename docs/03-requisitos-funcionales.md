@@ -92,6 +92,16 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 
 - **RF-AUT-001 — Aprobado:** la primera versión no tendrá cuentas de usuario.
 
+## Validación e integridad
+
+- **RF-VAL-001 — Aprobado:** toda regla de negocio se valida en el servidor y, cuando sea posible, también en la interfaz para feedback inmediato y en la base de datos para integridad estructural.
+- **RF-VAL-002 — Aprobado:** el servidor rechaza cualquier operación que incumpla una regla de dominio aprobada, independientemente de lo que envíe la interfaz.
+
+## Auditoría y observabilidad
+
+- **RF-OBS-001 — Aprobado:** el sistema registra localmente los cambios administrativos con marca temporal, tipo de entidad, identificador afectado y tipo de cambio, sin asociarlos a un usuario personal.
+- **RF-OBS-002 — Aprobado:** el sistema emite logs estructurados locales de errores, latencia de operaciones interactivas, generación y persistencia, sin incluir contenido de mapas, snapshots ni secretos.
+
 ## Trazabilidad
 
 Las reglas que determinan el cumplimiento de RF-GEN-004 se encuentran en [Reglas de dominio](04-reglas-de-dominio.md) y el proceso conocido en [Generación de mapas](06-generacion-de-mapas.md).

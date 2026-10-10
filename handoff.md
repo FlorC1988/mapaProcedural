@@ -35,6 +35,7 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Cierre de `PEN-010` y `PEN-012`: herramientas completas de edición, expansión, historial de sesión y acceso administrativo abierto sin autenticación ni autorización.
 - Cierre de `PEN-020`: ciclo de vida, identidad, coordenadas axiales, validación, herramientas, listado y concurrencia del editor administrativo de microbiomas.
 - Cierre de `PEN-014` y `PEN-015`: matriz y tabla de recursos, codificación visual de celdas, gimnasios y microbiomas, capa de influencia, inspector, navegación y errores.
+- Cierre de `PEN-016`: requisitos no funcionales aprobados para rendimiento, compatibilidad, accesibilidad, seguridad, privacidad, auditoría, validación, integridad, observabilidad, respaldo, migraciones, pruebas y metodología de benchmark para fijar el presupuesto de nodos.
 
 ## Trabajo en curso
 
@@ -43,13 +44,10 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 
 ## Próximos pasos
 
-1. Presentar y resolver las decisiones pendientes por bloques, sin inferir respuestas.
-2. Aprobar requisitos no funcionales y fijar mediante benchmarks el valor del presupuesto de nodos (`PEN-016`).
-3. Elegir el producto, esquema físico, migraciones y despliegue de la base relacional (`PEN-019`) cuando los requisitos necesarios estén aprobados.
-4. Elegir el resto de la arquitectura y tecnologías solo cuando los requisitos necesarios estén aprobados.
-5. Completar la trazabilidad integral y revisar suficiencia de la especificación.
-6. Resolver cualquier decisión nueva descubierta durante la revisión.
-7. Iniciar implementación únicamente con una especificación suficiente y aprobada.
+1. Resolver la tecnología concreta de persistencia, esquema físico, migraciones y despliegue (`PEN-019`) cuando sea el momento adecuado.
+2. Completar la trazabilidad integral y revisar suficiencia de la especificación.
+3. Resolver cualquier decisión nueva descubierta durante la revisión.
+4. Iniciar implementación únicamente con una especificación suficiente y aprobada.
 
 ## Decisiones
 
@@ -78,7 +76,7 @@ Decisiones rectoras:
 - biomas sin eliminación física y desactivación bloqueada por dependencias activas;
 - dimensiones pares 8..30 (default 16×16), microbiomas 0..10 (default 2), `N` 1..4 (default 2) y radio 0..2 (default 1);
 - generación mediante backtracking global, MRV y propagación de restricciones;
-- presupuesto global determinista, con un nodo por intento de asignación y valor numérico pendiente de benchmarks;
+- presupuesto global determinista, con un nodo por intento de asignación, valor numérico por calibrar mediante benchmarks;
 - resultados diferenciados entre éxito, ausencia de solución demostrada y presupuesto agotado, con errores internos aparte y descarte de parciales;
 - semilla visible y editable, generada si se omite, con reproducibilidad exacta bajo contexto idéntico;
 - persistencia central compartida en base relacional, con catálogos normalizados y mapas mediante cabecera y snapshot atómico;
@@ -96,7 +94,17 @@ Decisiones rectoras:
 - editor administrativo con adición adyacente, eliminación conectada, reanclaje, selección múltiple, listado y concurrencia optimista;
 - matriz de piezas por bioma y altura y tabla separada de marcadores por tipo de gimnasio;
 - celdas con color, icono, altura y coordenadas; gimnasios con símbolo y tipo; microbiomas con contorno;
-- capa conmutable de influencia, panel de detalle, ajuste inicial, zoom, desplazamiento y errores persistentes.
+- capa conmutable de influencia, panel de detalle, ajuste inicial, zoom, desplazamiento y errores persistentes;
+- rendimiento: generación normal ≤5 s, difícil ≤30 s, interfaz ≤100 ms, persistencia ≤2 s;
+- compatibilidad: escritorio Chromium, viewport mínimo 1280×720, 10 usuarios concurrentes;
+- accesibilidad: WCAG 2.2 AA, teclado completo, tecnologías de asistencia, respeto a preferencia de reducir movimiento;
+- seguridad y privacidad: red privada, HTTPS no obligatorio, sin datos personales, sin analíticas ni telemetría;
+- auditoría administrativa sin identidad de usuario, retención mínima 30 días;
+- validación en cliente, servidor y base de datos, con autoridad en el servidor;
+- observabilidad local: logs estructurados y métricas sin contenido sensible;
+- respaldo y migraciones: responsabilidad de la infraestructura, migraciones versionadas hacia adelante;
+- pruebas: pirámide completa con unitarias, integración, contratos, end-to-end y accesibilidad;
+- benchmark de generación: casos de referencia en estación de desarrollo, percentil 99 en 5 s y 30 s.
 
 ## Contexto técnico
 
@@ -109,7 +117,8 @@ El editor no admite posiciones vacías. Permite modificar bioma, altura, gimnasi
 El área administrativa no tiene protección en el MVP y está disponible para cualquier usuario de la instalación. Las definiciones de microbioma tienen identidad, nombre único, estado y versión; usan coordenadas axiales relativas conectadas respecto de un ancla y solo se guardan si cumplen todas las validaciones. No se eliminan físicamente y las nuevas se crean activas.
 
 Los recursos se presentan como matriz de piezas por bioma y altura y tabla separada de gimnasios por tipo. La visualización combina color, iconos y texto; superpone gimnasios, contornea microbiomas y ofrece una capa de influencia conmutable, inspector de celda, zoom y desplazamiento.
-El generador usa backtracking global entre las fases aprobadas, MRV y propagación de restricciones. Cada alternativa intentada consume un nodo de un presupuesto global determinista cuyo valor se fijará tras benchmarks. Agotar el espacio demuestra ausencia de solución; agotar el presupuesto no. Los candidatos parciales se descartan.
+
+El generador usa backtracking global entre las fases aprobadas, MRV y propagación de restricciones. Cada alternativa intentada consume un nodo de un presupuesto global determinista cuyo valor se calibrará mediante benchmarks en una estación de desarrollo típica con Chromium. El límite normal se fijará en el percentil 99 de ejecuciones exitosas dentro de 5 s; el límite difícil, en el percentil 99 dentro de 30 s. Agotar el espacio demuestra ausencia de solución; agotar el presupuesto no. Los candidatos parciales se descartan.
 
 Toda aleatoriedad procede de una semilla visible y editable. Si se omite, se genera y muestra antes de buscar. La repetición exacta exige la misma semilla, configuración, catálogos y definiciones, y versión del algoritmo.
 
@@ -121,6 +130,8 @@ Cada gimnasio es una entidad con identidad y uno de 18 tipos fijos. La generaci�
 
 Los biomas tienen identidad, nombre único sin sensibilidad a mayúsculas, color, icono y estado. Solo los activos participan en configuraciones nuevas. Las incompatibilidades son pares simétricos entre biomas distintos.
 
+Los requisitos no funcionales están completos: rendimiento, compatibilidad, accesibilidad, seguridad, privacidad, auditoría, validación, integridad, observabilidad, respaldo, migraciones, pruebas y benchmark. Quedan bajo `PEN-019` el producto concreto de base de datos, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue.
+
 Archivos relevantes:
 
 - `README.md`: índice y autoridad documental.
@@ -131,6 +142,7 @@ Archivos relevantes:
 - `docs/05-modelo-de-datos.md`: estructura conceptual y modelo de persistencia.
 - `docs/08-administracion-de-catalogos.md`: operación e integridad histórica de catálogos.
 - `docs/09-interfaz-y-flujos.md`: flujos de generación, guardado, reapertura y edición.
+- `docs/10-requisitos-no-funcionales.md`: requisitos de calidad aprobados.
 - `docs/11-criterios-de-aceptacion.md`: comportamientos verificables.
 - `docs/12-decisiones.md`: decisiones aprobadas y pendientes.
 
@@ -152,21 +164,20 @@ Archivos relevantes:
 - herramientas de edición y acceso administrativo propagados; `PEN-010` y `PEN-012` solo permanecen como trazabilidad de decisiones resueltas;
 - administración de microbiomas propagada; `PEN-020` solo permanece como trazabilidad de una decisión resuelta;
 - recursos y representación visual propagados; `PEN-014` y `PEN-015` solo permanecen como trazabilidad de decisiones resueltas;
+- requisitos no funcionales, seguridad, privacidad, auditoría, observabilidad, respaldo, migraciones, pruebas y benchmark propagados; `PEN-016` solo permanece como trazabilidad de una decisión resuelta;
 - no existe código que verificar en esta fase.
 
 ## Problemas conocidos
 
-- El producto, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue de la base relacional no están aprobados.
-- El valor numérico del presupuesto de nodos depende de benchmarks y requisitos de rendimiento aún no aprobados.
+- El producto, esquema físico, formato técnico del snapshot, migraciones, copias de seguridad y despliegue de la base relacional no están aprobados (`PEN-019`).
 
 ## Deuda técnica
 
 No existe implementación, por lo que todavía no hay deuda técnica de código. Se registra como deuda documental:
 
 - completar trazabilidad integral entre requisitos, reglas y criterios;
-- convertir los requisitos no funcionales pendientes en especificaciones verificables;
-- definir el producto, esquema físico, migraciones y operación de la persistencia relacional;
-- definir requisitos no funcionales medibles y fijar mediante benchmarks el presupuesto de nodos.
+- definir el producto, esquema físico, migraciones y operación de la persistencia relacional (`PEN-019`);
+- calibrar e implementar el benchmark para fijar el presupuesto numérico de nodos durante la construcción.
 
 ## Instrucciones para el siguiente agente
 

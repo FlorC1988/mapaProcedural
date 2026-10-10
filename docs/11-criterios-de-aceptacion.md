@@ -514,6 +514,86 @@ Al regenerar desde un mapa guardado, el sistema usa la configuración, catálogo
 
 Trazabilidad: DEC-047, RF-MAP-011, RD-REG-007.
 
+## Requisitos no funcionales
+
+### CA-RNF-001 — Tiempos de generación
+
+Dados los casos de referencia aprobados, el 99% de las generaciones normales completan en 5 s o menos y el 99% de las difíciles en 30 s o menos, medido desde la solicitud hasta el resultado o fallo determinístico.
+
+Trazabilidad: DEC-063, RNF-PER-001, RNF-PER-002, RNF-PER-005.
+
+### CA-RNF-002 — Tiempo de respuesta de la interfaz
+
+Dada una operación interactiva habitual, el sistema responde en 100 ms o menos en condiciones de referencia.
+
+Trazabilidad: DEC-063, RNF-PER-003.
+
+### CA-RNF-003 — Tiempo de persistencia
+
+Dada una operación de guardar, abrir, listar o eliminar, el sistema completa la operación en 2 s o menos en condiciones de referencia.
+
+Trazabilidad: DEC-063, RNF-PER-004.
+
+### CA-RNF-004 — Presupuesto calibrado
+
+Dados los benchmarks ejecutados en una estación de desarrollo típica con Chromium, el presupuesto normal se fija en el percentil 99 de ejecuciones exitosas dentro de 5 s y el difícil en el percentil 99 dentro de 30 s.
+
+Trazabilidad: DEC-072, RNF-PER-005, RF-GEN-015.
+
+### CA-RNF-005 — Soporte oficial
+
+La aplicación se prueba y soporta oficialmente en escritorio con Chromium y viewport mínimo 1280×720.
+
+Trazabilidad: DEC-064, RNF-COM-001, RNF-COM-002.
+
+### CA-RNF-006 — Accesibilidad
+
+La interfaz cumple WCAG 2.2 nivel AA, es operable completamente por teclado, expone información semántica a tecnologías de asistencia y respeta la preferencia de reducir movimiento.
+
+Trazabilidad: DEC-065, RNF-ACC-001 a RNF-ACC-004.
+
+### CA-RNF-007 — Sin datos personales ni telemetría
+
+La aplicación no solicita ni almacena datos personales y no envía analíticas ni telemetría a servicios externos.
+
+Trazabilidad: DEC-067, RNF-PRI-001, RNF-PRI-002.
+
+### CA-RNF-008 — Logs sin contenido sensible
+
+Los logs y métricas locales no contienen contenido de mapas, snapshots ni secretos de conexión o configuración.
+
+Trazabilidad: DEC-070, RNF-OBS-003, RNF-PRI-003.
+
+### CA-RNF-009 — Auditoría administrativa
+
+Dado un cambio administrativo, el sistema registra marca temporal, tipo de entidad, identificador afectado y tipo de cambio, sin identidad de usuario personal.
+
+Trazabilidad: DEC-068, RNF-AUD-001, RNF-AUD-002, RF-OBS-001.
+
+### CA-RNF-010 — Validación en servidor
+
+Dada una petición que incumple una regla de dominio aprobada, el servidor rechaza la operación y la base de datos mantiene la integridad estructural.
+
+Trazabilidad: DEC-069, RF-VAL-001, RF-VAL-002, RNF-SEG-004.
+
+### CA-RNF-011 — Escritura atómica
+
+Dada una operación de guardar un mapa o definición, la actualización del estado, la fecha de modificación y la versión de concurrencia se aplican de forma atómica; si falla, el estado persistido no queda parcialmente modificado.
+
+Trazabilidad: DEC-069, RNF-CON-001, RF-MAP-010, RF-ADM-014.
+
+### CA-RNF-012 — Migraciones hacia adelante
+
+Dada una nueva versión del esquema o del formato de snapshot, la migración se aplica mediante un script o proceso versionado que solo avanza y que es probado antes de su uso.
+
+Trazabilidad: DEC-071, RNF-CON-004.
+
+### CA-RNF-013 — Estrategia de pruebas
+
+El proyecto incluye pruebas unitarias, de integración, de contratos de datos, end-to-end de los flujos críticos y verificación de accesibilidad.
+
+Trazabilidad: DEC-071, RNF-MAN-001.
+
 ## Criterios pendientes
 
 El producto y esquema físico de persistencia, los objetivos medibles de accesibilidad, los requisitos restantes de calidad y rendimiento y los detalles técnicos de mensajes y observabilidad requieren decisiones adicionales antes de contar con criterios verificables completos.
