@@ -10,7 +10,8 @@ import type { MapaGenerado } from "../api";
 
 const S = 26;
 const H = Math.sqrt(3) * S;
-const PALETA_MICRO = ["#7c3aed", "#0891b2", "#dc2626", "#ca8a04", "#4f46e5", "#0d9488", "#be185d", "#65a30d"];
+// Contorno de instancias de microbioma: violeta uniforme punteado.
+const COLOR_MICRO = "#7c3aed";
 
 // Ángulos de los 6 vértices del hexágono flat-top.
 const VERTICES = [0, 60, 120, 180, 240, 300].map((a) => (a * Math.PI) / 180);
@@ -31,12 +32,14 @@ function centro(fila: number, columna: number): { cx: number; cy: number } {
   };
 }
 
-function vertice(cx: number, cy: number, angulo: number): string {
-  return `${(cx + S * Math.cos(angulo)).toFixed(2)},${(cy + S * Math.sin(angulo)).toFixed(2)}`;
+function vertice(cx: number, cy: number, angulo: number, s = S): string {
+  return `${(cx + s * Math.cos(angulo)).toFixed(2)},${(cy + s * Math.sin(angulo)).toFixed(2)}`;
 }
 
-function poligono(cx: number, cy: number): string {
-  return VERTICES.map((a) => vertice(cx, cy, a)).join(" ");
+// El polígono se dibuja levemente achicado para que los bordes no se
+// superpongan entre celdas adyacentes ni con la trama/borde de gimnasio.
+function poligono(cx: number, cy: number, s = S * 0.97): string {
+  return VERTICES.map((a) => vertice(cx, cy, a, s)).join(" ");
 }
 
 interface Seleccion {
@@ -67,7 +70,7 @@ export default function Tablero({
     [mapa]
   );
   const microPorId = useMemo(
-    () => new Map(mapa.instanciasMicrobioma.map((m, i) => [m.id, { ...m, indice: i }])),
+    () => new Map(mapa.instanciasMicrobioma.map((m) => [m.id, m])),
     [mapa]
   );
 
@@ -127,7 +130,7 @@ export default function Tablero({
     const instanciaDePos = new Map<string, string>();
     for (const m of mapa.instanciasMicrobioma)
       for (const c of m.celdas) instanciaDePos.set(`${c.fila},${c.columna}`, m.id);
-    const out: { id: string; indice: number; segmentos: [string, string][] }[] = [];
+    const out: { id: string; segmentos: [string, string][] }[] = [];
     for (const m of mapa.instanciasMicrobioma) {
       const segmentos: [string, string][] = [];
       for (const c of m.celdas) {
@@ -141,11 +144,10 @@ export default function Tablero({
           if (!vecinoEsMismo) segmentos.push([vertice(cx, cy, (a1 * Math.PI) / 180), vertice(cx, cy, (a2 * Math.PI) / 180)]);
         }
       }
-      const indice = microPorId.get(m.id)?.indice ?? 0;
-      out.push({ id: m.id, indice, segmentos });
+      out.push({ id: m.id, segmentos });
     }
     return out;
-  }, [mapa, microPorId]);
+  }, [mapa]);
 
   const celdaSel = seleccion ? celdaPorPos.get(`${seleccion.fila},${seleccion.columna}`) : null;
   const gymSel = celdaSel?.gimnasio ? mapa.gimnasios.find((g) => g.id === celdaSel.gimnasio) : null;
@@ -229,7 +231,6 @@ export default function Tablero({
               const { cx, cy } = centro(c.fila, c.columna);
               const bioma = biomaPorId.get(c.bioma);
               const gym = gymPorPos.get(`${c.fila},${c.columna}`);
-              const sel = seleccion?.fila === c.fila && seleccion?.columna === c.columna;
               return (
                 <g
                   key={`${c.fila}-${c.columna}`}
@@ -248,8 +249,8 @@ export default function Tablero({
                   <polygon
                     points={poligono(cx, cy)}
                     fill={bioma?.color ?? "#e4e4e7"}
-                    stroke={sel ? "#18181b" : "#fafafa"}
-                    strokeWidth={sel ? 3 : 1.5}
+                    stroke="#fafafa"
+                    strokeWidth={1.5}
                   />
                   {gym && (
                     <polygon
@@ -287,7 +288,10 @@ export default function Tablero({
                       key={`inf-${g.id}-${c.fila}-${c.columna}`}
                       points={poligono(cx, cy)}
                       fill="#7f1d1d"
-                      opacity={0.18}
+                      fillOpacity={0.3}
+                      stroke="#7f1d1d"
+                      strokeOpacity={0.55}
+                      strokeWidth={1.5}
                       pointerEvents="none"
                     />
                   );
@@ -302,12 +306,28 @@ export default function Tablero({
                     y1={p1.split(",")[1]}
                     x2={p2.split(",")[0]}
                     y2={p2.split(",")[1]}
-                    stroke={PALETA_MICRO[cont.indice % PALETA_MICRO.length]}
-                    strokeWidth={3}
+                    stroke={COLOR_MICRO}
+                    strokeWidth={3.5}
+                    strokeDasharray="6 3"
+                    strokeLinecap="round"
                   />
                 ))}
               </g>
             ))}
+            {celdaSel && (() => {
+              const { cx, cy } = centro(celdaSel.fila, celdaSel.columna);
+              // Anillo de selección inset: queda dentro del hexágono y las
+              // celdas vecinas no pueden taparlo.
+              return (
+                <polygon
+                  points={poligono(cx, cy, S * 0.88)}
+                  fill="none"
+                  stroke="#18181b"
+                  strokeWidth={3}
+                  pointerEvents="none"
+                />
+              );
+            })()}
           </g>
         </svg>
         <aside className="inspector" aria-label="Detalle de celda">

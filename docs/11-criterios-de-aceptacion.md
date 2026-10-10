@@ -176,7 +176,7 @@ Trazabilidad: DEC-059, RF-REC-002, RD-REC-003.
 
 ### CA-REC-005 — Marcadores de gimnasio
 
-La tabla separada muestra exactamente una fila por cada tipo de gimnasio presente, su cantidad y un total; no muestra tipos ausentes y cada gimnasio contribuye un marcador.
+La tabla separada muestra exactamente una fila por cada tipo de gimnasio presente y un total; la cantidad se muestra junto al nombre como `(N)` solo cuando supera 1; no muestra tipos ausentes y cada gimnasio contribuye un marcador.
 
 Trazabilidad: DEC-059, RF-REC-003, RD-REC-004, RD-REC-005.
 
@@ -222,7 +222,7 @@ Trazabilidad: RF-VIS-003, RD-GIM-001, RD-GIM-002, RD-GIM-015.
 
 ### CA-VIS-002 — Bioma y altura
 
-Cada celda muestra color e icono del bioma, su nombre como texto accesible y una etiqueta persistente Z1, Z2 o Z3, por lo que el bioma no se identifica únicamente mediante color.
+Cada celda muestra color e icono del bioma (salvo en posiciones con gimnasio, donde la etiqueta del tipo sustituye al icono), su nombre como texto accesible y una etiqueta persistente Z1, Z2 o Z3, por lo que el bioma no se identifica únicamente mediante color.
 
 Trazabilidad: DEC-060, RF-VIS-002.
 

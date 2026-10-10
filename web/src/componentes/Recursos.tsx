@@ -22,6 +22,7 @@ export default function Recursos({
       nombre: biomas.find((b) => b.id === id)?.nombre ?? id,
       v,
       total: v[0] + v[1] + v[2],
+      estructura: v[0] + 2 * v[1] + 3 * v[2],
     }))
     .sort((a, b) => a.nombre.localeCompare(b.nombre));
   const totales = [0, 0, 0];
@@ -44,6 +45,7 @@ export default function Recursos({
             <th>Z2</th>
             <th>Z3</th>
             <th>Total</th>
+            <th>Total estructura</th>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +56,7 @@ export default function Recursos({
               <td>{f.v[1]}</td>
               <td>{f.v[2]}</td>
               <td>{f.total}</td>
+              <td>{f.estructura}</td>
             </tr>
           ))}
           <tr>
@@ -64,6 +67,7 @@ export default function Recursos({
             <td>{totales[1]}</td>
             <td>{totales[2]}</td>
             <td>{totales[0] + totales[1] + totales[2]}</td>
+            <td>{totales[0] + 2 * totales[1] + 3 * totales[2]}</td>
           </tr>
         </tbody>
       </table>
@@ -71,21 +75,21 @@ export default function Recursos({
         <thead>
           <tr>
             <th>Tipo de gimnasio</th>
-            <th>Marcadores</th>
           </tr>
         </thead>
         <tbody>
           {filasGym.map((f) => (
             <tr key={f.nombre}>
-              <td>{f.nombre}</td>
-              <td>{f.cant}</td>
+              <td>
+                {f.nombre}
+                {f.cant > 1 ? ` (${f.cant})` : ""}
+              </td>
             </tr>
           ))}
           <tr>
             <td>
-              <strong>Total</strong>
+              <strong>Total ({mapa.gimnasios.length})</strong>
             </td>
-            <td>{mapa.gimnasios.length}</td>
           </tr>
         </tbody>
       </table>

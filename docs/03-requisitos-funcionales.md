@@ -27,16 +27,16 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 ## Visualización y recursos
 
 - **RF-VIS-001 — Aprobado:** el sistema representará el tablero mediante una geometría hexagonal correcta.
-- **RF-VIS-002 — Aprobado:** cada posición mostrará color e icono de bioma, nombre accesible, etiqueta persistente Z1, Z2 o Z3 y coordenadas visibles.
+- **RF-VIS-002 — Aprobado:** cada posición mostrará color e icono de bioma, nombre accesible, etiqueta persistente Z1, Z2 o Z3 y coordenadas visibles. En posiciones con gimnasio, la etiqueta del tipo sustituye al icono del bioma y la celda se distingue con trama y borde.
 - **RF-VIS-003 — Aprobado:** el gimnasio se mostrará por encima del bioma mediante símbolo y etiqueta de tipo.
 - **RF-VIS-004 — Aprobado:** cada instancia de microbioma tendrá contorno propio y, al seleccionarse, mostrará nombre e identidad.
 - **RF-VIS-005 — Aprobado:** las áreas de influencia generadas podrán mostrarse en una capa conmutable, oculta inicialmente; un gimnasio sin área asociada no mostrará influencia.
 - **RF-VIS-006 — Aprobado:** seleccionar una celda abrirá un panel con coordenadas, bioma, altura y sus asociaciones opcionales de gimnasio y microbioma.
 - **RF-VIS-007 — Aprobado:** el tablero se ajustará inicialmente al espacio y permitirá zoom mediante controles y rueda, y desplazamiento por arrastre.
 - **RF-VIS-008 — Aprobado:** los errores de campo aparecerán junto al control y en un resumen; los fallos de operación se mostrarán en un aviso persistente con causa y acción posible.
-- **RF-REC-001 — Aprobado:** el sistema mostrará una matriz de piezas necesarias con filas por los biomas presentes ordenados por nombre, columnas Z1, Z2 y Z3 y totales.
+- **RF-REC-001 — Aprobado:** el sistema mostrará una matriz de piezas necesarias con filas por los biomas presentes ordenados por nombre, columnas Z1, Z2 y Z3, totales y una columna de total de estructura calculada como `Z1 + 2·Z2 + 3·Z3`.
 - **RF-REC-002 — Aprobado:** la matriz no representa inventario disponible ni calcula por separado tapas y partes individuales; los microbiomas no tienen desglose separado.
-- **RF-REC-003 — Aprobado:** una tabla separada mostrará una fila por cada tipo de gimnasio presente, su cantidad de marcadores y el total.
+- **RF-REC-003 — Aprobado:** una tabla separada mostrará una fila por cada tipo de gimnasio presente y el total; la cantidad de marcadores se muestra junto al nombre como `(N)` solo cuando supera 1.
 - **RF-REC-004 — Aprobado:** después de editar, deshacer o rehacer, ambas tablas se recalcularán para representar el estado actual.
 
 ## Mapas guardados

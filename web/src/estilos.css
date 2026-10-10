@@ -266,6 +266,13 @@ label.check {
   touch-action: none;
 }
 
+/* El anillo de selección dentro de la celda ya indica el foco; el contorno
+   por defecto del navegador dibuja un rectángulo que se recorta entre celdas. */
+.visor-svg g:focus,
+.visor-svg g:focus-visible {
+  outline: none;
+}
+
 .inspector {
   width: 16rem;
   flex-shrink: 0;
@@ -286,6 +293,94 @@ label.check {
 
 .inspector dd {
   margin: 0 0 0.5rem;
+}
+
+/* --- Tema oscuro (la interfaz, no el tablero) ------------------------------ */
+
+.app[data-tema="oscuro"] {
+  color-scheme: dark;
+  background: #18181b;
+  color: #e4e4e7;
+}
+
+.app[data-tema="oscuro"] .cabecera {
+  background: #27272a;
+  border-bottom-color: #3f3f46;
+}
+
+.app[data-tema="oscuro"] .cabecera nav a {
+  color: #d4d4d8;
+}
+
+.app[data-tema="oscuro"] .cabecera nav a.active {
+  background: #3f3f46;
+  color: #fafafa;
+}
+
+.app[data-tema="oscuro"] button {
+  background: #e4e4e7;
+  color: #18181b;
+  border-color: #52525b;
+}
+
+.app[data-tema="oscuro"] input,
+.app[data-tema="oscuro"] select,
+.app[data-tema="oscuro"] textarea {
+  background: #27272a;
+  color: #e4e4e7;
+  border: 1px solid #52525b;
+}
+
+.app[data-tema="oscuro"] th,
+.app[data-tema="oscuro"] td {
+  border-bottom-color: #3f3f46;
+}
+
+.app[data-tema="oscuro"] .aviso-error {
+  background: #450a0a;
+  border-color: #b91c1c;
+  color: #fecaca;
+}
+
+.app[data-tema="oscuro"] .editor,
+.app[data-tema="oscuro"] .form-admin,
+.app[data-tema="oscuro"] .inspector {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.app[data-tema="oscuro"] .editor-aviso {
+  background: #422006;
+  border-color: #a16207;
+  color: #fef08a;
+}
+
+.app[data-tema="oscuro"] .ayuda,
+.app[data-tema="oscuro"] .campo small,
+.app[data-tema="oscuro"] .inspector dt {
+  color: #a1a1aa;
+}
+
+.app[data-tema="oscuro"] .enlace {
+  color: #93c5fd;
+}
+
+.app[data-tema="oscuro"] .visor-controles button {
+  background: #27272a;
+  color: #e4e4e7;
+  border-color: #52525b;
+}
+
+.app[data-tema="oscuro"] .visor-controles {
+  color: #e4e4e7;
+}
+
+.app[data-tema="oscuro"] .muestra-color {
+  border-color: #71717a;
+}
+
+.boton-tema {
+  margin-left: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -77,7 +77,7 @@ Cada posición muestra siempre sus coordenadas `(fila, columna)`, numeradas desd
 
 Cada celda usa el color de fondo y el icono configurados para su bioma, junto con una etiqueta persistente Z1, Z2 o Z3. El nombre del bioma está disponible como texto accesible y la identificación no depende únicamente del color.
 
-Un gimnasio se superpone mediante un símbolo distintivo y una etiqueta de su tipo sin ocultar los datos lógicos del bioma y la altura. Cada instancia de microbioma se delimita con un contorno propio; al seleccionarla se muestran su nombre e identidad.
+Un gimnasio se superpone mediante una etiqueta con el símbolo distintivo y el nombre de su tipo, que ocupa el lugar del icono del bioma, más una trama diagonal y un borde que lo distinguen a simple vista. Cada instancia de microbioma se delimita con un contorno propio violeta punteado; al seleccionarla se muestran su nombre e identidad.
 
 Las áreas de influencia generadas están ocultas inicialmente y se muestran mediante una capa conmutable. La capa solo dibuja áreas asociadas existentes; un gimnasio creado o editado manualmente sin área no muestra influencia.
 
