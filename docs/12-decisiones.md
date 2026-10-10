@@ -11,7 +11,7 @@ Este es el registro obligatorio de decisiones. Una fila aprobada autoriza única
 | DEC-003 | 2026-10-08 | Continuidad | Crear y mantener `handoff.md` con estado, decisiones, verificación, contexto técnico, problemas y deuda técnica. | `handoff.md`, `00-gobierno.md` | Aprobada |
 | DEC-004 | 2026-10-08 | Raíz del proyecto | Usar `C:\Users\Florencia\Documents\Proyectos\mapa`. | Todos | Aprobada |
 | DEC-005 | 2026-10-08 | Organización | Dividir la fuente de verdad en una estructura documental completa. | `README.md`, `docs/` | Aprobada |
-| DEC-006 | 2026-10-08 | Borrador | Conservar `borrador especificacion.md` intacto como antecedente no normativo. | `README.md`, `00-gobierno.md` | Aprobada |
+| DEC-006 | 2026-10-08 | Borrador | Reemplazada por `DEC-089`: el borrador ya no se conserva en el repositorio. | `README.md`, `00-gobierno.md` | Obsoleta |
 | DEC-007 | 2026-10-08 | Registro | Mantener las aprobaciones en un registro central de decisiones. | Este archivo | Aprobada |
 | DEC-008 | 2026-10-08 | Alcance MVP | Incluir generación, visualización, guardado, reapertura y edición manual de mapas. | `01`, `03`, `07`, `09` | Aprobada |
 | DEC-009 | 2026-10-08 | Catálogos | Un administrador gestionará biomas, incompatibilidades y microbiomas. | `01`, `03`, `08` | Aprobada |
@@ -92,6 +92,9 @@ Este es el registro obligatorio de decisiones. Una fila aprobada autoriza única
 | DEC-084 | 2026-10-09 | Entidad Pieza física | No existe una entidad Pieza física persistente independiente. La Posición almacena directamente su bioma y su altura; la pieza física es un concepto derivado de esos valores, no una entidad propia del modelo de datos. Resuelve `PEN-021`. | `05`, `11`, `handoff` | Aprobada |
 | DEC-085 | 2026-10-09 | Mensajes de resultado de generación | El contenido exacto de los mensajes de resultado (éxito, sin solución, presupuesto agotado, error) es un detalle de implementación calibrable, redactado durante la construcción. Debe distinguir obligatoriamente las cuatro categorías ya aprobadas por `RF-GEN-016` y `DEC-041`, sin afirmar imposibilidad cuando solo se agotó el presupuesto. Resuelve `PEN-022`. | `06`, `11`, `handoff` | Aprobada |
 | DEC-086 | 2026-10-09 | Fórmula de distancia hexagonal | La distancia entre dos coordenadas axiales `(q1, r1)` y `(q2, r2)` se calcula como `(\|q1-q2\| + \|r1-r2\| + \|(q1+r1)-(q2+r2)\|) / 2`, la fórmula estándar de distancia axial en grillas hexagonales. Se aplica al radio global de influencia de gimnasios. Resuelve `PEN-023`. | `02`, `04`, `05`, `06`, `11`, `handoff` | Aprobada |
+| DEC-087 | 2026-10-10 | Lenguaje de implementación | Tanto el backend Node.js/Express como el frontend React se implementan en TypeScript. | `10`, `handoff` | Aprobada |
+| DEC-088 | 2026-10-10 | Tooling y estructura del código | El código se organiza como monorepo con `server/` (Express + TypeScript), `web/` (React + TypeScript con Vite como herramienta de build), `supabase/migrations/` para migraciones imperativas y `docker-compose.yml` raíz para el stack Supabase autohospedado. La implementación se entrega por fases; la Fase 1 cubre infraestructura, esquema de catálogos, datos semilla, API de catálogos y layout base del frontend. | `handoff` | Aprobada |
+| DEC-089 | 2026-10-10 | Eliminación del borrador | `borrador especificacion.md` se elimina del repositorio para evitar confusión con la documentación normativa. Reemplaza a `DEC-006`; la fuente de verdad queda únicamente en `docs/` y las decisiones aprobadas ya capturan todo su contenido relevante. | `README.md`, `00-gobierno.md`, `handoff.md` | Aprobada |
 
 ## Decisiones pendientes
 

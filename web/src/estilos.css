@@ -1,0 +1,296 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #d4d4d8;
+}
+
+.cabecera h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.cabecera nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.cabecera nav a {
+  color: #3f3f46;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.cabecera nav a.active {
+  font-weight: 600;
+  background: #e4e4e7;
+}
+
+.cabecera nav a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+main {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.aviso-error {
+  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+}
+
+.grilla-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.campo small {
+  color: #71717a;
+}
+
+.error-campo {
+  color: #991b1b;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+button {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #a1a1aa;
+  border-radius: 0.375rem;
+  background: #18181b;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  min-width: 30rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.barra-mapa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.barra-mapa .acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pedir-nombre {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.editor {
+  border: 1px solid #d4d4d8;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.editor-fila {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.editor-aviso {
+  background: #fef9c3;
+  border: 1px solid #eab308;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.expansion {
+  margin-top: 0.5rem;
+}
+
+.form-admin {
+  border: 1px solid #d4d4d8;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 42rem;
+}
+
+.form-admin label.check,
+label.check {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.lienzo-microbioma {
+  width: 100%;
+  max-height: 24rem;
+  border: 1px solid #e4e4e7;
+  background: #fafafa;
+}
+
+.celda-agregable {
+  cursor: pointer;
+}
+
+.celda-agregable:hover {
+  fill: #e0f2fe;
+}
+
+.celda-inerte {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.celda-def {
+  cursor: pointer;
+}
+
+.ayuda {
+  color: #52525b;
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+}
+
+.enlace {
+  background: none;
+  border: none;
+  color: #1d4ed8;
+  text-decoration: underline;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.muestra-color {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.25rem;
+  border: 1px solid #a1a1aa;
+  vertical-align: middle;
+}
+
+.visor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.visor-controles {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.visor-controles button {
+  background: #fff;
+  color: #18181b;
+}
+
+.visor-cuerpo {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.visor-svg {
+  flex: 1;
+  min-width: 0;
+  max-height: 75vh;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.375rem;
+  background: #fafafa;
+  touch-action: none;
+}
+
+.inspector {
+  width: 16rem;
+  flex-shrink: 0;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+}
+
+.inspector h3 {
+  margin-top: 0;
+}
+
+.inspector dt {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #71717a;
+}
+
+.inspector dd {
+  margin: 0 0 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

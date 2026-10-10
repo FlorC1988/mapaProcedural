@@ -7,7 +7,7 @@
 3. Ningún agente o implementador puede completar una ambigüedad por inferencia.
 4. El código, las pruebas y la interfaz deben ajustarse a la documentación aprobada.
 5. Ante una contradicción entre implementación y documentación, prevalece la documentación y se detiene el trabajo afectado hasta resolver la discrepancia.
-6. El borrador original es un antecedente no normativo y debe conservarse sin modificaciones.
+6. El borrador original fue eliminado del repositorio (`DEC-089`); todo su contenido relevante quedó capturado en la documentación normativa y las decisiones aprobadas.
 
 ## 2. Documentos normativos
 
@@ -27,7 +27,7 @@ Una conversación, propuesta o ejemplo no se considera aprobación salvo que la 
 
 ## 4. Cambios documentales
 
-- Toda afirmación normativa debe poder rastrearse al borrador original o a una decisión aprobada.
+- Toda afirmación normativa debe poder rastrearse a una decisión aprobada o a la documentación normativa vigente.
 - Una reorganización puede mejorar claridad, pero no alterar significado.
 - Las propuestas se etiquetan como **Pendiente** y no se redactan como requisitos vigentes.
 - Si dos documentos divergen, se registra la contradicción y se solicita una decisión.

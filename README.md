@@ -6,7 +6,7 @@ Este repositorio contiene la especificación y, posteriormente, la implementaci�
 
 La documentación normativa es la única fuente de verdad del proyecto. El código deberá ajustarse a ella y ninguna decisión pendiente podrá inferirse durante la implementación.
 
-El archivo [`borrador especificacion.md`](borrador%20especificacion.md) se conserva intacto como antecedente y no es normativo. En caso de discrepancia, prevalecen los documentos de `docs/` y las decisiones aprobadas registradas en [`docs/12-decisiones.md`](docs/12-decisiones.md).
+En caso de discrepancia, prevalecen los documentos de `docs/` y las decisiones aprobadas registradas en [`docs/12-decisiones.md`](docs/12-decisiones.md).
 
 ## Documentación
 
