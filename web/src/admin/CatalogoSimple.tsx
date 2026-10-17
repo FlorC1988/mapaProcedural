@@ -69,6 +69,9 @@ export default function CatalogoSimple({
           {error}
         </div>
       )}
+      <button type="button" onClick={() => abrir("nuevo")}>
+        {singular === "categoría" ? "Nueva" : "Nuevo"} {singular}
+      </button>
       <table>
         <thead>
           <tr>
@@ -96,9 +99,6 @@ export default function CatalogoSimple({
           ))}
         </tbody>
       </table>
-      <button type="button" onClick={() => abrir("nuevo")}>
-        Nuevo: {singular}
-      </button>
       {editando && (
         <Modal
           abierto

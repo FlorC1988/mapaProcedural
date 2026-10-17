@@ -267,6 +267,9 @@ label.check {
 .visor-svg {
   flex: 1;
   min-width: 0;
+  width: 100%;
+  height: auto;
+  min-height: 50vh;
   max-height: 75vh;
   border: 1px solid #e4e4e7;
   border-radius: 0.375rem;
@@ -303,6 +306,40 @@ label.check {
   margin: 0 0 0.5rem;
 }
 
+.pestanas-admin {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #d4d4d8;
+}
+
+.pestanas-admin button {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 0.375rem 0.375rem 0 0;
+  background: transparent;
+  color: #3f3f46;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pestanas-admin button[aria-selected="true"] {
+  background: #e4e4e7;
+  color: #18181b;
+  font-weight: 700;
+}
+
+.panel-admin {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.panel-admin > :first-child {
+  margin-top: 0;
+}
+
 /* --- Tema oscuro (la interfaz, no el tablero) ------------------------------ */
 
 .app[data-tema="oscuro"] {
@@ -329,6 +366,20 @@ label.check {
   background: #e4e4e7;
   color: #18181b;
   border-color: #52525b;
+}
+
+.app[data-tema="oscuro"] .pestanas-admin {
+  border-bottom-color: #3f3f46;
+}
+
+.app[data-tema="oscuro"] .pestanas-admin button {
+  background: transparent;
+  color: #d4d4d8;
+}
+
+.app[data-tema="oscuro"] .pestanas-admin button[aria-selected="true"] {
+  background: #3f3f46;
+  color: #fafafa;
 }
 
 .app[data-tema="oscuro"] input,
@@ -428,6 +479,162 @@ label.check {
   background: #27272a;
   border-color: #3f3f46;
   color: #e4e4e7;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  main {
+    padding: 0.75rem;
+  }
+
+  .cabecera {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .cabecera h1 {
+    font-size: 1rem;
+    flex: 1 1 100%;
+  }
+
+  .cabecera nav {
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .boton-tema {
+    margin-left: 0;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-size: 1rem; /* evita zoom de iOS en focus */
+  }
+
+  .grilla-form {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .campo input,
+  .campo select,
+  .campo textarea {
+    width: 100%;
+  }
+
+  .barra-mapa {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .barra-mapa .acciones {
+    width: 100%;
+  }
+
+  .barra-mapa .acciones button {
+    flex: 1 1 auto;
+    min-width: 5rem;
+  }
+
+  .visor-cuerpo {
+    flex-direction: column;
+  }
+
+  .visor-svg {
+    max-height: none;
+    min-height: 60vh;
+  }
+
+  .inspector {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .visor-controles {
+    flex-wrap: wrap;
+  }
+
+  .visor-controles button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .editor-fila {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .editor-fila label,
+  .editor-fila input,
+  .editor-fila select {
+    width: 100%;
+  }
+
+  table {
+    min-width: unset;
+    width: 100%;
+    font-size: 0.875rem;
+    display: block;
+    overflow-x: auto;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .form-admin {
+    max-width: none;
+  }
+
+  .lienzo-microbioma {
+    max-height: none;
+    height: auto;
+  }
+
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtros input,
+  .filtros select {
+    width: 100%;
+  }
+
+  .modal {
+    padding: 0.75rem;
+    max-width: 96vw;
+  }
+
+  .modal .acciones,
+  .editor-fila {
+    flex-direction: column;
+  }
+
+  .modal .acciones button,
+  .editor-fila button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabecera h1 {
+    font-size: 0.95rem;
+  }
+
+  .visor-svg {
+    min-height: 55vh;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

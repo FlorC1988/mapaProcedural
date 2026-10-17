@@ -95,6 +95,11 @@ export default function BiomasAdmin({
           {error}
         </div>
       )}
+      {!editando && (
+        <button type="button" onClick={abrirNuevo}>
+          Nuevo bioma
+        </button>
+      )}
       <table>
         <thead>
           <tr>
@@ -133,11 +138,6 @@ export default function BiomasAdmin({
           ))}
         </tbody>
       </table>
-      {!editando && (
-        <button type="button" onClick={abrirNuevo}>
-          Nuevo bioma
-        </button>
-      )}
       {editando && (
         <Modal
           abierto

@@ -4,6 +4,7 @@ import { ProveedorMapa } from "./estado";
 import Generar from "./paginas/Generar";
 import Mapas from "./paginas/Mapas";
 import Administracion from "./paginas/Administracion";
+import Pokedex from "./paginas/Pokedex";
 
 export default function App() {
   const [tema, setTema] = useState<"claro" | "oscuro">(
@@ -21,6 +22,7 @@ export default function App() {
         <nav aria-label="Principal">
           <NavLink to="/">Generar</NavLink>
           <NavLink to="/mapas">Mapas</NavLink>
+          <NavLink to="/pokedex">Pokedex</NavLink>
           <NavLink to="/administracion">Administración</NavLink>
         </nav>
         <button
@@ -37,6 +39,7 @@ export default function App() {
           <Routes>
           <Route path="/" element={<Generar />} />
           <Route path="/mapas" element={<Mapas />} />
+          <Route path="/pokedex" element={<Pokedex />} />
           <Route path="/administracion" element={<Administracion />} />
           </Routes>
         </ProveedorMapa>

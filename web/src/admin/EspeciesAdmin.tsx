@@ -193,7 +193,6 @@ export default function EspeciesAdmin({
 
   return (
     <>
-      <h3>Especies</h3>
       {error && (
         <div className="aviso-error" role="alert">
           {error}

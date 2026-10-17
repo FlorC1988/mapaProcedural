@@ -116,6 +116,9 @@ export default function AtaquesAdmin({
           {error}
         </div>
       )}
+      <button type="button" onClick={() => { setEditando("nuevo"); setForm(FORM_VACIO); setError(null); }}>
+        Nuevo ataque
+      </button>
       <div className="filtros">
         <input
           type="search"
@@ -187,9 +190,6 @@ export default function AtaquesAdmin({
           ))}
         </tbody>
       </table>
-      <button type="button" onClick={() => { setEditando("nuevo"); setForm(FORM_VACIO); setError(null); }}>
-        Nuevo ataque
-      </button>
       {editando && (
         <Modal
           abierto
