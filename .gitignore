@@ -4,3 +4,34 @@ dist/
 supabase/.branches/
 supabase/.temp/
 logs/
+
+# LibreOffice / Excel locks and binary reference files
+.~lock.*#
+*.xlsx
+
+# Supabase Studio generated query snippets
+supabase/snippets/
+
+# dotenvx and local environment files
+.env.keys
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+
+# Loose log files
+*.log
+
+# Test coverage artifacts
+coverage/
+.nyc_output/
+
+# OS / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Supabase auth signing keys (explicitly warned in config.toml)
+signing_keys.json
