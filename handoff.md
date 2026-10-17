@@ -1,6 +1,6 @@
 # Handoff del proyecto
 
-Última actualización: 2026-10-12
+Última actualización: 2026-10-17
 
 ## Estado actual y fase
 
@@ -56,12 +56,26 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 ## Trabajo en curso
 
 - Implementación por fases del MVP aprobado. Fases 1 a 6 completadas.
+- **Fase 7 (expansión Pokémon) completada:** migración `20261017000000_catalogos_pokemon.sql` (tablas `especies`, `ataques`, `estados_alterados`, `categorias_especie`, `especie_categorias`, `especie_tipos_ataque`, `aparicion_bioma`, con RLS) y script `server/scripts/importar-pokedex.mjs` ejecutado: 19 estados, 237 ataques, 18 categorías, 1214 especies (344 activas). Dependencia nueva `xlsx@0.18.5` en `server` (npm reporta 1 advisory de severidad alta sin fix; uso solo en script local con archivo confiable).
+- Especificación de la expansión Pokémon (`docs/13-expansion-pokemon.md`) **aprobada** el 2026-10-16 (`DEC-093`, `DEC-094`, `DEC-095`): catálogo administrable de especies y ataques importado de `National Pokedex Gen 9.xlsx`, aparición por bioma definida por tipo elemental con flag `incluyeTipoII` y probabilidad como atributo de especie, vínculo con gimnasios por tipo, tabla única de 18 tipos compartida, y atributos de especie ampliados (cadena evolutiva, Sprite URL, Grito, generación, probabilidades de aparición y shiny) con origen mixto xlsx/app/APIs públicas. También aprobadas: `DEC-096` (interpretación de columnas), `DEC-097` (estados alterados como catálogo normativo), `DEC-098` (aparición como cálculo derivado a demanda, sin generación ni snapshot), `DEC-100` (importar las 1215 especies; activas solo las 344 con datos de juego completos), `DEC-101` (script desde xlsx inicialmente; luego CSV y después interfaz; el xlsx queda como fuente canónica), `DEC-102` (sin reproducibilidad para datos Pokémon), `DEC-103` (PokéAPI como fuente externa de sprite/grito/generación/evolución), `DEC-104` (categoría de especie como conjunto multivalor — catálogo normalizado `categorias_especie` + tabla de unión; el importador divide la columna C por comas). Pendiente: `DEC-099` (vínculo especie–gimnasio, aplazado a etapa posterior).
+- **Fase 8 (API y administración Pokémon) completada:** router `server/src/routes/pokemon.ts` con CRUD y concurrencia optimista para `estados-alterados`, `categorias-especie`, `ataques` (filtros por nombre/tipo/estado), `especies` (filtros por nombre/tipo/categoría/estado/generación, orden por dex o nombre) y `apariciones` (GET global + PUT por bioma que reemplaza el conjunto de tipos con `incluyeTipoII`), todo con auditoría en `auditoria_admin`. Frontend: `api.ts` ampliado, componentes `CatalogoSimple` (estados y categorías), `AtaquesAdmin`, `EspeciesAdmin` y `AparicionAdmin` integrados en `Administracion.tsx`. Verificado: typecheck en verde, endpoints respondiendo sobre la base local, PUT de apariciones con ida y vuelta, 409 por duplicado y 409 por versión desactualizada, auditoría registrada.
+- **Fase 10 (PokéAPI) completada:** script `server/scripts/sincronizar-pokeapi.mjs` (`node scripts/sincronizar-pokeapi.mjs [nombre]`; acepta filtro opcional por nombre). Completa solo campos nulos: `sprite_url` (`sprites.front_default`, el sprite clásico — no el official-artwork), `grito_url` (`cries.latest`), `generacion` (`pokemon-species.generation`, romano→número), `preevolucion`/`evolucion`/`etapa` (desde `evolution-chain`, nombres en español via `pokemon-species.names`). Además completa `especie_categorias` con las categorías `Baby`, `Legendary` y `Mythical` según `is_baby`/`is_legendary`/`is_mythical` (solo agrega vínculos, nunca quita). Mapeo nombre→slug: formas regionales (Alola/Galar/Hisui/Paldea), Mega (X/Y), G-Max, paréntesis genéricos, alias explícitos para casos especiales (Nidoran ♀/♂, Farfetch'd/Sirfetch'd, Tauros Paldea, Darmanitan Zen, Minior cores, etc.) y fallback por `pokemon-species.varieties`. Cada especie actualizada registra `auditoria_admin` con `tipo_cambio='sincronizacion'`; pausa de 150 ms entre requests y 3 reintentos por endpoint. Resultado verificado: **1214/1214 especies** con sprite, grito, generación y etapa; 19 Baby, 95 Legendary, 30 Mythical; 0 no encontradas, 0 errores.
 
 ## Próximos pasos
 
-1. Benchmark de generación para fijar el presupuesto numérico de nodos (`DEC-072`). Urgente: con 500 000 nodos, 30×30 / 10 microbiomas / N=4 / radio 2 tarda unos 5,6 min en devolver `presupuesto_agotado`, muy por encima del límite de 30 s.
-2. Fases B–D de la revisión de arquitectura (ver Deuda técnica).
-3. Cobertura de pruebas automatizadas y accesibilidad (RNF).
+Expansión Pokémon — fases propuestas (todas las decisiones necesarias aprobadas salvo `DEC-099`):
+
+1. ~~**Fase 7 — Esquema y carga inicial**~~ completada (ver Trabajo en curso).
+2. ~~**Fase 8 — API y administración**~~ completada (ver Trabajo en curso).
+3. **Fase 9 — Aparición derivada:** cálculo a demanda de especies elegibles por bioma en la vista de mapa (`DEC-098`).
+4. ~~**Fase 10 — PokéAPI**~~ completada (ver Trabajo en curso).
+5. Posterior: vínculo especie–gimnasio (`DEC-099`, pendiente).
+
+Pendientes del MVP anterior (en paralelo):
+
+- Benchmark de generación para fijar el presupuesto numérico de nodos (`DEC-072`). Urgente: con 500 000 nodos, 30×30 / 10 microbiomas / N=4 / radio 2 tarda unos 5,6 min en devolver `presupuesto_agotado`, muy por encima del límite de 30 s.
+- Fases B–D de la revisión de arquitectura (ver Deuda técnica).
+- Cobertura de pruebas automatizadas y accesibilidad (RNF).
 
 ## Decisiones
 

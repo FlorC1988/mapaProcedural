@@ -23,7 +23,8 @@ En caso de discrepancia, prevalecen los documentos de `docs/` y las decisiones a
 11. [Requisitos no funcionales](docs/10-requisitos-no-funcionales.md)
 12. [Criterios de aceptación](docs/11-criterios-de-aceptacion.md)
 13. [Registro de decisiones](docs/12-decisiones.md)
-14. [Handoff](handoff.md)
+14. [Expansión Pokémon](docs/13-expansion-pokemon.md) — **Pendiente**
+15. [Handoff](handoff.md)
 
 ## Estados normativos
 

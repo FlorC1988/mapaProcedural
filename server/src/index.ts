@@ -4,6 +4,7 @@ import { log } from "./logger.js";
 import { catalogos } from "./routes/catalogos.js";
 import { generarRouter } from "./routes/generar.js";
 import { mapas } from "./routes/mapas.js";
+import { pokemon } from "./routes/pokemon.js";
 
 const app = express();
 app.use(express.json({ limit: "5mb" }));
@@ -33,6 +34,7 @@ app.get("/health", async (_req, res) => {
 app.use("/api", catalogos);
 app.use("/api", generarRouter);
 app.use("/api", mapas);
+app.use("/api", pokemon);
 
 // Fallos de operación: aviso persistente con causa y acción (RF-VIS-008).
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

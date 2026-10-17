@@ -104,6 +104,69 @@ export interface MapaGuardado extends ResumenMapa {
   snapshot: SnapshotMapa;
 }
 
+// --- Expansión Pokémon (docs/13) --------------------------------------------
+
+export interface EstadoAlterado {
+  id: string;
+  nombre: string;
+  activo: boolean;
+  version: number;
+}
+
+export interface CategoriaEspecie {
+  id: string;
+  nombre: string;
+  activo: boolean;
+  version: number;
+  usos: number;
+}
+
+export interface Ataque {
+  id: string;
+  nombre: string;
+  tipo_id: number;
+  descripcion: string;
+  danio: number | null;
+  estado_objetivo_id: string | null;
+  estado_auto_id: string | null;
+  activo: boolean;
+  version: number;
+  creadoEn: string;
+  modificadoEn: string;
+}
+
+export interface Especie {
+  id: string;
+  dex: number;
+  nombre: string;
+  tipo_i: number;
+  tipo_ii: number | null;
+  hp: number | null;
+  iniciativa: number | null;
+  puntos_evolucion: number | null;
+  ataque_inicial_id: string | null;
+  preevolucion: string | null;
+  evolucion: string | null;
+  etapa: string | null;
+  sprite_url: string | null;
+  grito_url: string | null;
+  generacion: number | null;
+  prob_aparicion: number | null;
+  prob_shiny: number | null;
+  activo: boolean;
+  version: number;
+  categorias: string[];
+  tipos_ataque: number[];
+  creadoEn: string;
+  modificadoEn: string;
+}
+
+export interface AparicionBioma {
+  bioma_id: string;
+  tipo_id: number;
+  incluyeTipoII: boolean;
+}
+
 export class ErrorApi extends Error {
   constructor(
     public causa: string,
@@ -202,4 +265,72 @@ export const api = {
   },
   regenerarMapa: (id: string) =>
     pedir<RespuestaGeneracion>(`/api/mapas/${id}/regenerar`, { method: "POST" }),
+
+  // --- Expansión Pokémon ---
+  estadosAlterados: () => pedir<EstadoAlterado[]>("/api/estados-alterados"),
+  crearEstadoAlterado: (nombre: string) =>
+    pedir<{ id: string }>("/api/estados-alterados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre }),
+    }),
+  actualizarEstadoAlterado: (id: string, datos: { nombre: string; activo: boolean; version: number }) =>
+    pedir<{ version: number }>(`/api/estados-alterados/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  categoriasEspecie: () => pedir<CategoriaEspecie[]>("/api/categorias-especie"),
+  crearCategoriaEspecie: (nombre: string) =>
+    pedir<{ id: string }>("/api/categorias-especie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre }),
+    }),
+  actualizarCategoriaEspecie: (id: string, datos: { nombre: string; activo: boolean; version: number }) =>
+    pedir<{ version: number }>(`/api/categorias-especie/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  ataques: (q = "", estado = "", tipo = "", orden = "asc") =>
+    pedir<Ataque[]>(
+      `/api/ataques?q=${encodeURIComponent(q)}&estado=${estado}&tipo=${tipo}&orden=${orden}`
+    ),
+  crearAtaque: (datos: Omit<Ataque, "id" | "activo" | "version" | "creadoEn" | "modificadoEn">) =>
+    pedir<{ id: string }>("/api/ataques", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  actualizarAtaque: (id: string, datos: Omit<Ataque, "id" | "creadoEn" | "modificadoEn"> & { version: number }) =>
+    pedir<{ version: number }>(`/api/ataques/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  especies: (params: { q?: string; estado?: string; tipo?: string; categoria?: string; generacion?: string; orden?: string } = {}) => {
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) if (v) qs.set(k, v);
+    return pedir<Especie[]>(`/api/especies?${qs.toString()}`);
+  },
+  crearEspecie: (datos: Omit<Especie, "id" | "activo" | "version" | "creadoEn" | "modificadoEn">) =>
+    pedir<{ id: string }>("/api/especies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  actualizarEspecie: (id: string, datos: Omit<Especie, "id" | "creadoEn" | "modificadoEn"> & { version: number }) =>
+    pedir<{ version: number }>(`/api/especies/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }),
+  apariciones: () => pedir<AparicionBioma[]>("/api/apariciones"),
+  actualizarApariciones: (biomaId: string, tipos: { tipo_id: number; incluyeTipoII: boolean }[]) =>
+    pedir<{ ok: true }>(`/api/apariciones/${biomaId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tipos }),
+    }),
 };

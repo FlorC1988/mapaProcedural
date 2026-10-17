@@ -436,3 +436,34 @@ label.check {
     transition: none !important;
   }
 }
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.filtros input[type="number"] {
+  width: 5rem;
+}
+
+label.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-right: 0.8rem;
+  font-weight: normal;
+}
+
+fieldset {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
+
+legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0 0.3rem;
+}
