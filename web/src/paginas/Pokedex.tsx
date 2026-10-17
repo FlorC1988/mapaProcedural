@@ -33,7 +33,6 @@ export default function Pokedex() {
 
   return (
     <section aria-labelledby="titulo-pokedex">
-      <h2 id="titulo-pokedex">Pokédex</h2>
       {error && (
         <div className="aviso-error" role="alert">
           {error}
