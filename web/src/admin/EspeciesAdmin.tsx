@@ -52,6 +52,7 @@ const FORM_VACIO = (tipoPorDefecto: number): FormEspecie => ({
 });
 
 const numOVacio = (v: number | null) => (v == null ? "" : String(v));
+const porcentajeOVacio = (v: number | null) => (v == null ? "" : (v * 100).toFixed(1));
 
 export default function EspeciesAdmin({
   tipos,
@@ -99,8 +100,8 @@ export default function EspeciesAdmin({
       sprite_url: e.sprite_url ?? "",
       grito_url: e.grito_url ?? "",
       generacion: numOVacio(e.generacion),
-      prob_aparicion: numOVacio(e.prob_aparicion),
-      prob_shiny: numOVacio(e.prob_shiny),
+      prob_aparicion: porcentajeOVacio(e.prob_aparicion),
+      prob_shiny: porcentajeOVacio(e.prob_shiny),
       categorias: new Set(e.categorias),
       tipos_ataque: new Set(e.tipos_ataque),
     });
@@ -108,6 +109,10 @@ export default function EspeciesAdmin({
   }
 
   const num = (s: string) => (s.trim() === "" ? null : Number(s));
+  const porcentaje = (s: string) => {
+    const valor = num(s);
+    return valor == null ? null : valor / 100;
+  };
 
   async function guardar() {
     setOcupado(true);
@@ -127,8 +132,8 @@ export default function EspeciesAdmin({
       sprite_url: form.sprite_url || null,
       grito_url: form.grito_url || null,
       generacion: num(form.generacion),
-      prob_aparicion: num(form.prob_aparicion),
-      prob_shiny: num(form.prob_shiny),
+      prob_aparicion: porcentaje(form.prob_aparicion),
+      prob_shiny: porcentaje(form.prob_shiny),
       categorias: [...form.categorias],
       tipos_ataque: [...form.tipos_ataque],
     };
@@ -256,7 +261,7 @@ export default function EspeciesAdmin({
         <tbody>
           {(especies ?? []).map((e) => (
             <tr key={e.id}>
-              <td>{e.dex}</td>
+              <td>{Number(e.dex).toFixed(1)}</td>
               <td>{e.nombre}</td>
               <td>{nombreTipo(e.tipo_i)}</td>
               <td>{nombreTipo(e.tipo_ii)}</td>
@@ -384,8 +389,8 @@ export default function EspeciesAdmin({
             {campoTexto("grito_url", "Grito URL", 500)}
             <div className="editor-fila">
               {campoNumero("generacion", "Generación", 0, 99)}
-              {campoNumero("prob_aparicion", "Prob. aparición (0-1)", 0, 1, "0.0001")}
-              {campoNumero("prob_shiny", "Prob. shiny (0-1)", 0, 1, "0.0001")}
+              {campoNumero("prob_aparicion", "Prob. aparición (%)", 0, 100, "0.1")}
+              {campoNumero("prob_shiny", "Prob. shiny (%)", 0, 100, "0.1")}
             </div>
             <div className="editor-fila">
               <button type="submit" disabled={ocupado}>
