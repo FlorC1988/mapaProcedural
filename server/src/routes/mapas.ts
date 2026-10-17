@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { log } from "../logger.js";
-import { snapshotAContexto, VERSION_SNAPSHOT, type ContextoSnapshot } from "../dominio/contexto.js";
-import { generar, PRESUPUESTO_NODOS } from "../generador/generador.js";
+import { VERSION_SNAPSHOT, type ContextoSnapshot } from "../dominio/snapshot.js";
+import { respuestaParametrosInvalidos, validarConfig } from "../dominio/config.js";
+import { VERSION_ALGORITMO } from "../generador/generador.js";
+import { generarEnWorker } from "../generador/ejecutar.js";
 
 export const mapas = Router();
 
@@ -169,21 +171,22 @@ mapas.post("/mapas/:id/regenerar", async (req, res, next) => {
       return;
     }
     const snapshot = rows[0].snapshot as {
-      configuracion: Record<string, number | string[] | undefined>;
+      configuracion: Record<string, unknown>;
       contexto: ContextoSnapshot;
     };
-    const ctx = snapshotAContexto(snapshot.contexto);
-    const conf = { ...snapshot.configuracion, ...(req.body?.configuracion ?? {}) } as {
-      filas: number;
-      columnas: number;
-      microbiomas: number;
-      microbiomasElegidos?: string[];
-      n: number;
-      radio: number;
-      semilla?: string;
-    };
+    const extra = req.body?.configuracion;
+    const validacion = validarConfig({
+      ...snapshot.configuracion,
+      ...(extra && typeof extra === "object" && !Array.isArray(extra) ? extra : {}),
+    });
+    if ("errores" in validacion) {
+      res.status(400).json(respuestaParametrosInvalidos(validacion.errores));
+      return;
+    }
+    // El resultado nuevo lo produce el algoritmo vigente; el resto del contexto es el histórico.
+    const contexto: ContextoSnapshot = { ...snapshot.contexto, versionAlgoritmo: VERSION_ALGORITMO };
     const inicio = process.hrtime.bigint();
-    const { resultado, semilla } = generar(conf, ctx, PRESUPUESTO_NODOS);
+    const { resultado, semilla } = await generarEnWorker(validacion.config, contexto);
     log("info", "regeneracion", {
       mapaId: req.params.id,
       resultado: resultado.tipo,
@@ -195,10 +198,12 @@ mapas.post("/mapas/:id/regenerar", async (req, res, next) => {
       semilla,
       mapa: resultado.tipo === "exito" ? resultado.mapa : null,
       contexto: {
-        biomas: ctx.biomas.map(({ id, nombre, color, icono }) => ({ id, nombre, color, icono })),
-        tiposGimnasio: ctx.tiposGimnasio.map(({ id, nombre }) => ({ id, nombre })),
+        biomas: contexto.biomas.map(({ id, nombre, color, icono, activo }) => ({ id, nombre, color, icono, activo })),
+        tiposGimnasio: contexto.tiposGimnasio.map(({ id, nombre }) => ({ id, nombre })),
       },
+      contextoSnapshot: contexto,
       versionSnapshot: VERSION_SNAPSHOT,
+      versionAlgoritmo: VERSION_ALGORITMO,
     });
   } catch (e) {
     next(e);

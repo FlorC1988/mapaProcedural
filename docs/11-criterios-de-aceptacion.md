@@ -384,9 +384,9 @@ Trazabilidad: DEC-051, RF-EDI-011, RD-MIC-011.
 
 ### CA-EDI-010 — Expansión por bordes
 
-La interfaz solo permite agregar cantidades no negativas por borde cuando las sumas vertical y horizontal son pares y las dimensiones resultantes permanecen entre 8 y 30. Las celdas nuevas reciben el bioma activo y la altura elegidos.
+La interfaz solo permite agregar cantidades no negativas por borde cuando las sumas vertical y horizontal son pares, la cantidad agregada por la izquierda es par y las dimensiones resultantes permanecen entre 8 y 30. Las celdas nuevas reciben el bioma activo y la altura elegidos. Una cantidad impar por la izquierda se rechaza con un mensaje explicativo.
 
-Trazabilidad: DEC-052, RF-EDI-012, RD-TAB-012.
+Trazabilidad: DEC-052, DEC-092, RF-EDI-012, RD-TAB-012.
 
 ### CA-EDI-011 — Coordenadas y configuración tras expansión
 

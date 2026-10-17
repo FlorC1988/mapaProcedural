@@ -54,7 +54,7 @@ Como la edición es libre, no se exigen tipos distintos, separación, pertenenci
 
 ## 5. Expansión del tablero
 
-El tablero puede ampliarse, pero no recortarse. El usuario indica cantidades no negativas para arriba, abajo, izquierda y derecha. La suma vertical y la horizontal deben ser pares y las dimensiones resultantes deben permanecer entre 8 y 30.
+El tablero puede ampliarse, pero no recortarse. El usuario indica cantidades no negativas para arriba, abajo, izquierda y derecha. La suma vertical y la horizontal deben ser pares, la cantidad agregada por la izquierda también debe ser par para conservar la geometría hexagonal (`DEC-092`) y las dimensiones resultantes deben permanecer entre 8 y 30.
 
 Antes de aplicar la expansión se seleccionan un bioma activo y una altura para todas las celdas nuevas. Agregar arriba o a la izquierda desplaza las coordenadas de las posiciones existentes sin cambiar sus contenidos ni asociaciones. Las filas y columnas de la configuración se actualizan para futuras regeneraciones.
 

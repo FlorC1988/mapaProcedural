@@ -53,7 +53,7 @@ Eliminar abre una confirmación simple que muestra el nombre y ofrece Cancelar o
 7. La operación se incorpora al historial de sesión y puede deshacerse o rehacerse.
 8. El usuario puede guardar el mapa sin validación ni estado válido o inválido mediante el flujo aprobado de guardado y concurrencia.
 
-Editar un gimnasio permite agregar, quitar, mover o cambiar tipo sin aplicar influencia. Estampar un microbioma exige seleccionar una definición activa y un ancla válida. Ampliar exige indicar cantidades por borde, con sumas pares, dimensiones finales `8..30`, un bioma activo y una altura para las celdas nuevas.
+Editar un gimnasio permite agregar, quitar, mover o cambiar tipo sin aplicar influencia. Estampar un microbioma exige seleccionar una definición activa y un ancla válida. Ampliar exige indicar cantidades por borde, con sumas pares, cantidad par por la izquierda, dimensiones finales `8..30`, un bioma activo y una altura para las celdas nuevas.
 
 Solicitar una nueva generación crea otro mapa desde la configuración actualizada y el contexto histórico, e ignora las ediciones del mapa anterior. Cerrar o recargar limpia el historial de deshacer y rehacer.
 

@@ -66,7 +66,7 @@ Los requisitos etiquetados como **Aprobado** provienen del borrador o de decisio
 - **RF-EDI-009 — Aprobado:** editar un gimnasio no aplicará influencia ni cambiará biomas; agregarlo, moverlo o cambiar su tipo eliminará su área asociada, y quitarlo eliminará solo la entidad. Las celdas de origen o destino pertenecientes a microbiomas aplicarán la desvinculación de RF-EDI-004.
 - **RF-EDI-010 — Aprobado:** estampar un microbioma activo exigirá que quepa completo, sobrescribirá bioma y altura sin rotar ni reflejar, conservará gimnasios y desvinculará instancias intersectadas.
 - **RF-EDI-011 — Aprobado:** mover un microbioma desvinculará su ubicación anterior conservando sus valores y lo estampará desde la nueva ancla.
-- **RF-EDI-012 — Aprobado:** el tablero podrá ampliarse por sus bordes sin recortarse, manteniendo dimensiones pares entre 8 y 30; las celdas nuevas recibirán el bioma activo y la altura elegidos y la configuración adoptará las nuevas dimensiones.
+- **RF-EDI-012 — Aprobado:** el tablero podrá ampliarse por sus bordes sin recortarse, manteniendo dimensiones pares entre 8 y 30 y una cantidad par agregada por la izquierda (`DEC-092`); las celdas nuevas recibirán el bioma activo y la altura elegidos y la configuración adoptará las nuevas dimensiones.
 - **RF-EDI-013 — Aprobado:** el editor mantendrá durante la sesión un historial de múltiples operaciones para deshacer y rehacer; una nueva edición tras deshacer descartará la rama de rehacer y cerrar o recargar limpiará el historial.
 
 ## Catálogos y administración

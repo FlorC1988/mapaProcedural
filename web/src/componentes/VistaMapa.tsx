@@ -28,15 +28,18 @@ export interface DatosMapa {
   identidad: IdentidadMapa | null;
 }
 
-export function datosDesdeRespuesta(r: RespuestaGeneracion): DatosMapa | null {
+export function datosDesdeRespuesta(
+  r: RespuestaGeneracion,
+  identidad: IdentidadMapa | null = null
+): DatosMapa | null {
   if (r.resultado !== "exito" || !r.mapa) return null;
   return {
     mapa: r.mapa,
     contextoVisual: r.contexto,
     contextoSnapshot: r.contextoSnapshot,
     versionSnapshot: r.versionSnapshot ?? 1,
-    versionAlgoritmo: 1,
-    identidad: null,
+    versionAlgoritmo: r.versionAlgoritmo ?? 1,
+    identidad,
   };
 }
 
@@ -190,7 +193,8 @@ export default function VistaMapa({
     if (!identidad) return;
     await ejecutar(async () => {
       const r = await api.regenerarMapa(identidad.id);
-      const d = datosDesdeRespuesta(r);
+      // Conserva la identidad: Guardar actualiza el mismo mapa (RD-REG-007).
+      const d = datosDesdeRespuesta(r, identidad);
       if (d) cambiarDatos(d);
       else
         setError({

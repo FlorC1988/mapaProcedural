@@ -8,6 +8,10 @@
 
 ## Arranque
 
+Forma rápida (Windows): doble clic en `iniciar.cmd` o `.\iniciar.ps1` desde PowerShell. El script comprueba requisitos, abre Docker Desktop si no está corriendo y espera a que el motor responda, instala dependencias si faltan, crea `server/.env`, inicia Supabase si no está corriendo (la primera vez descarga sus imágenes Docker) y espera a que sus contenedores estén listos, libera los puertos 3000/5173 si los ocupa una instancia anterior de este proyecto, levanta backend y frontend (accesible también desde la red local, `host: true` en `web/vite.config.ts`), abre el navegador y muestra la URL de acceso desde la red (la IP `192.168.*` detectada en ese momento). Backend y frontend corren en segundo plano con sus logs en `logs/dev.log`. Al presionar Enter en la consola se detienen; la base queda corriendo (`npm run db:stop`). Si se cierra la ventana con la X, quedan procesos huérfanos que el siguiente arranque detiene automáticamente.
+
+Forma manual:
+
 ```bash
 # 1. Base de datos (primera vez descarga las imágenes)
 npm run db:start

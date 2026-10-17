@@ -20,7 +20,7 @@
 - **RD-TAB-009:** filas y columnas deben ser pares para dividir el tablero en cuatro cuadrantes iguales.
 - **RD-TAB-010:** los cuadrantes se forman dividiendo por la mitad los índices visibles de filas y columnas; cada cuadrante contiene `(F / 2) × (C / 2)` posiciones.
 - **RD-TAB-011:** la edición manual no puede dejar una posición vacía.
-- **RD-TAB-012:** un mapa editado puede ampliarse por cualquiera de sus bordes sin recortarse; la suma agregada al eje vertical y al horizontal debe ser par y las dimensiones resultantes permanecen entre 8 y 30.
+- **RD-TAB-012:** un mapa editado puede ampliarse por cualquiera de sus bordes sin recortarse; la suma agregada al eje vertical y al horizontal debe ser par, la cantidad agregada por la izquierda debe ser par (`DEC-092`) y las dimensiones resultantes permanecen entre 8 y 30.
 
 ## 3. Adyacencia
 

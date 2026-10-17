@@ -265,6 +265,7 @@ export default function Editor({
                 type="number"
                 min={0}
                 max={30}
+                step={b === "izquierda" ? 2 : 1}
                 value={bordes[b]}
                 onChange={(e) => setBordes({ ...bordes, [b]: Number(e.target.value) })}
                 style={{ width: "4rem" }}
@@ -293,7 +294,10 @@ export default function Editor({
             Aplicar
           </button>
         </div>
-        <small>Las sumas vertical y horizontal deben ser pares; dimensiones finales pares entre 8 y 30.</small>
+        <small>
+          Las sumas vertical y horizontal deben ser pares y la expansión por la izquierda, par;
+          dimensiones finales pares entre 8 y 30.
+        </small>
       </details>
     </div>
   );

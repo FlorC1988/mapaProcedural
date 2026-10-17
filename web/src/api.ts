@@ -76,6 +76,7 @@ export interface RespuestaGeneracion {
   contexto: ContextoVisual;
   contextoSnapshot?: unknown;
   versionSnapshot?: number;
+  versionAlgoritmo?: number;
 }
 
 export interface SnapshotMapa {

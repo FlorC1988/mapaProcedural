@@ -3,3 +3,4 @@ dist/
 .env
 supabase/.branches/
 supabase/.temp/
+logs/

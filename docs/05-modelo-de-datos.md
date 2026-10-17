@@ -51,7 +51,7 @@ distancia = (|q1 - q2| + |r1 - r2| + |(q1 + r1) - (q2 + r2)|) / 2
 
 Esta es la fórmula estándar de distancia axial en grillas hexagonales y determina la adyacencia (distancia 1) y el área de influencia de los gimnasios según el radio global configurado. Resuelve `DEC-086`.
 
-La edición no admite posiciones vacías. Al ampliar por arriba o por la izquierda, las posiciones existentes cambian sus coordenadas visibles y axiales de acuerdo con el desplazamiento; sus contenidos y asociaciones se conservan.
+La edición no admite posiciones vacías. Al ampliar por arriba o por la izquierda (siempre en cantidad par por la izquierda, `DEC-092`), las posiciones existentes cambian sus coordenadas visibles y axiales de acuerdo con el desplazamiento; sus contenidos y asociaciones se conservan.
 
 ## 2. Pieza física
 

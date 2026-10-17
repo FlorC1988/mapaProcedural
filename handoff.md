@@ -1,6 +1,6 @@
 # Handoff del proyecto
 
-Última actualización: 2026-10-10
+Última actualización: 2026-10-12
 
 ## Estado actual y fase
 
@@ -47,6 +47,7 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 - Implementación de la Fase 6: `server/src/dominio/microbioma.ts` (validación estructural de definiciones: ancla (0,0), 1–900 celdas únicas, conectividad BFS, extensión ≤30×30 en ambas paridades del ancla, biomas activos); mutaciones en `server/src/routes/catalogos.ts` (POST/PUT biomas con incompatibilidades simétricas transaccionales y bloqueo de desactivación RF-ADM-008, PUT tipos-gimnasio con al menos un bioma activo, POST/PUT microbiomas con concurrencia optimista, registro en `auditoria_admin`); frontend `web/src/admin/` (`BiomasAdmin`, `TiposAdmin`, `MicrobiomasAdmin` con búsqueda/filtro/orden, `EditorMicrobioma` con herramientas agregar/eliminar/ancla/editar y selección múltiple).
 - Implementación de la Fase 5: `web/src/editor/operaciones.ts` (funciones puras: cambiar bioma/altura con desvinculación de instancia, agregar/quitar/mover/cambiar tipo de gimnasio sin reaplicar influencia, estampar/mover/desvincular microbioma con validación de encaje, expansión por bordes con desplazamiento de coordenadas), `web/src/componentes/Editor.tsx` (selector de herramienta + parámetros + formulario de expansión), historial de sesión deshacer/rehacer en `VistaMapa` (botones + Ctrl+Z/Y), recálculo automático de recursos. El estado del mapa en curso vive en `web/src/estado.tsx` (contexto global) y sobrevive a la navegación entre páginas.
 - Implementación de la Fase 1: `supabase init` con dos migraciones (`catalogos_iniciales` crea `biomas`, `incompatibilidades`, `tipos_gimnasio`, `tipo_gimnasio_biomas`, `microbiomas`, `auditoria_admin` y `mapas` con snapshot JSONB y RLS completo; `semilla_catalogos` inserta los 5 biomas, Hielo–Magma, los 18 tipos y las 90 compatibilidades). Backend Express+TS con `pg`, logs estructurados, `/health` y `GET /api/biomas|tipos-gimnasio|microbiomas`. Frontend Vite+React+TS con navegación, formulario de generación con rangos y defaults aprobados (validación de cliente), y página de administración que lista los catálogos. Verificado: migraciones aplican limpio, API responde con datos semilla, typecheck sin errores. Comandos en `DESARROLLO.md`.
+- Revisión de arquitectura (2026-10-12) y corrección de su fase A: (1) `cargarContextoSnapshot` consulta con `ORDER BY` estable porque el orden de entrada al PRNG forma parte del contexto reproducible (`DEC-042`); `VERSION_ALGORITMO` pasa a `2`. (2) Validación de configuración centralizada en `server/src/dominio/config.ts` y aplicada también a `POST /api/mapas/:id/regenerar`, que antes aceptaba `configuracion` sin validar. (3) El generador corre en un worker thread por petición (`server/src/generador/worker.ts`, `ejecutar.ts`; la parte pura del snapshot vive en `server/src/dominio/snapshot.ts`), de modo que una generación larga no bloquea la API. (4) Regenerar devuelve `contextoSnapshot` y `versionAlgoritmo`, y el cliente conserva la identidad del mapa: antes un mapa regenerado no podía guardarse. (5) `DEC-092`: la expansión por la izquierda debe ser par.
 - Auditoría de consistencia documental: detección y cierre de `PEN-021`, `PEN-022` y `PEN-023`, y corrección de textos obsoletos que contradecían decisiones ya aprobadas.
 - Cierre de `PEN-021`: la pieza física no es una entidad persistente independiente; la posición almacena directamente bioma y altura (`DEC-084`).
 - Cierre de `PEN-022`: el contenido exacto de los mensajes de resultado de generación es un detalle de implementación calibrable, debe distinguir las cuatro categorías aprobadas (`DEC-085`).
@@ -58,8 +59,9 @@ Completar y aprobar la especificación del MVP de una aplicación web que genera
 
 ## Próximos pasos
 
-1. Benchmark de generación para fijar el presupuesto numérico de nodos (`DEC-072`).
-2. Cobertura de pruebas automatizadas y accesibilidad (RNF).
+1. Benchmark de generación para fijar el presupuesto numérico de nodos (`DEC-072`). Urgente: con 500 000 nodos, 30×30 / 10 microbiomas / N=4 / radio 2 tarda unos 5,6 min en devolver `presupuesto_agotado`, muy por encima del límite de 30 s.
+2. Fases B–D de la revisión de arquitectura (ver Deuda técnica).
+3. Cobertura de pruebas automatizadas y accesibilidad (RNF).
 
 ## Decisiones
 
@@ -188,13 +190,17 @@ Archivos relevantes:
 ## Problemas conocidos
 
 - No hay decisiones técnicas pendientes del MVP. El valor numérico exacto del presupuesto de nodos se calibrará durante la construcción según `DEC-072`, y el contenido exacto de los mensajes de resultado según `DEC-085`.
+- Al pasar a `VERSION_ALGORITMO = 2`, las semillas anteriores ya no reproducen el mismo mapa. Regenerar un mapa guardado con versión 1 usa el algoritmo vigente, y su snapshot pasa a registrar la versión 2.
+- La generación en el worker no se puede cancelar: si el cliente abandona la petición, el worker sigue hasta terminar o agotar el presupuesto.
 
 ## Deuda técnica
 
-No existe implementación, por lo que todavía no hay deuda técnica de código. Se registra como deuda documental:
+Pendiente de la revisión de arquitectura del 2026-10-12:
 
-- completar trazabilidad integral entre requisitos, reglas y criterios;
-- calibrar e implementar el benchmark para fijar el presupuesto numérico de nodos durante la construcción.
+- **Fase B (integridad):** el contexto histórico del snapshot llega desde el cliente en `POST/PUT /mapas` y el servidor lo guarda tal cual; `validarSnapshot` solo comprueba la forma superficial; en `catalogos.ts` la auditoría se escribe después del `commit` y las comprobaciones RF-ADM-008 se hacen fuera de la transacción.
+- **Fase C (estructura):** tipos, rangos y geometría `hex` duplicados entre `server/` y `web/` (sin paquete compartido); formato de error distinto en catálogos (`{causa: "codigo"}`) y en mapas (`{error, causa, accion}`); snake_case y camelCase mezclados en la API; SQL dentro de las rutas; el mapa abierto en `Mapas` vive en estado local y se pierde al navegar; `deshacer`/`rehacer` en `VistaMapa` ejecutan efectos dentro de updaters de estado.
+- **Fase D (calidad):** sin pruebas automatizadas, sin ESLint, sin Dockerfiles.
+- Documental: completar la trazabilidad integral entre requisitos, reglas y criterios.
 
 ## Instrucciones para el siguiente agente
 

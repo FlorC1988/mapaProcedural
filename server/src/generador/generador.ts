@@ -26,7 +26,7 @@ import type {
 } from "../dominio/tipos.js";
 import { crearPRNG, generarSemillaAleatoria, mezclar } from "./prng.js";
 
-export const VERSION_ALGORITMO = 1;
+export const VERSION_ALGORITMO = 2;
 // Presupuesto provisional de nodos; el valor definitivo se calibra con
 // benchmarks según DEC-072.
 export const PRESUPUESTO_NODOS = 500_000;

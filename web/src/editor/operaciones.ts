@@ -210,6 +210,11 @@ export function expandir(
   if (vertical % 2 !== 0 || horizontal % 2 !== 0) {
     throw new ErrorEdicion("Las sumas vertical y horizontal deben ser pares.");
   }
+  // DEC-092: un desplazamiento impar de columnas invierte la paridad de todas
+  // ellas y altera la vecindad hexagonal del contenido existente.
+  if (bordes.izquierda % 2 !== 0) {
+    throw new ErrorEdicion("Para conservar la geometría, la expansión por la izquierda debe ser par.");
+  }
   const nuevasFilas = filas + vertical;
   const nuevasColumnas = columnas + horizontal;
   if (nuevasFilas < 8 || nuevasFilas > 30 || nuevasColumnas < 8 || nuevasColumnas > 30) {
