@@ -30,7 +30,7 @@ export default function AtaquesAdmin({
   onCambio: () => void;
 }) {
   const [ataques, setAtaques] = useState<Ataque[] | null>(null);
-  const [filtros, setFiltros] = useState({ q: "", estado: "", tipo: "", orden: "asc" });
+  const [filtros, setFiltros] = useState({ q: "", estado: "", tipo: "", orden: "asc", objetivo: "", auto: "" });
   const [editando, setEditando] = useState<Ataque | "nuevo" | null>(null);
   const [form, setForm] = useState<FormAtaque>(FORM_VACIO);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function AtaquesAdmin({
 
   function cargar() {
     api
-      .ataques(filtros.q, filtros.estado, filtros.tipo, filtros.orden)
+      .ataques(filtros.q, filtros.estado, filtros.tipo, filtros.orden, filtros.objetivo, filtros.auto)
       .then(setAtaques)
       .catch(() => setError("No se pudieron cargar los ataques."));
   }
@@ -136,6 +136,32 @@ export default function AtaquesAdmin({
           {tipos.map((t) => (
             <option key={t.id} value={t.id}>
               {t.nombre}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Filtrar por estado sobre el objetivo"
+          value={filtros.objetivo}
+          onChange={(e) => setFiltros({ ...filtros, objetivo: e.target.value })}
+        >
+          <option value="">Estado sobre el objetivo: todos</option>
+          <option value="ninguno">Sin estado sobre el objetivo</option>
+          {estados.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nombre}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Filtrar por estado sobre el usuario"
+          value={filtros.auto}
+          onChange={(e) => setFiltros({ ...filtros, auto: e.target.value })}
+        >
+          <option value="">Estado sobre el usuario: todos</option>
+          <option value="ninguno">Sin estado sobre el usuario</option>
+          {estados.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nombre}
             </option>
           ))}
         </select>

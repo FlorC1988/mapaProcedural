@@ -293,9 +293,9 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datos),
     }),
-  ataques: (q = "", estado = "", tipo = "", orden = "asc") =>
+  ataques: (q = "", estado = "", tipo = "", orden = "asc", estadoObjetivo = "", estadoAuto = "") =>
     pedir<Ataque[]>(
-      `/api/ataques?q=${encodeURIComponent(q)}&estado=${estado}&tipo=${tipo}&orden=${orden}`
+      `/api/ataques?q=${encodeURIComponent(q)}&estado=${estado}&tipo=${tipo}&orden=${orden}&estado_objetivo=${encodeURIComponent(estadoObjetivo)}&estado_auto=${encodeURIComponent(estadoAuto)}`
     ),
   crearAtaque: (datos: Omit<Ataque, "id" | "activo" | "version" | "creadoEn" | "modificadoEn">) =>
     pedir<{ id: string }>("/api/ataques", {

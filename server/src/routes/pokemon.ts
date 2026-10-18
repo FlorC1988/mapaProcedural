@@ -183,7 +183,7 @@ pokemon.put("/categorias-especie/:id", async (req, res, next) => {
 
 pokemon.get("/ataques", async (req, res, next) => {
   try {
-    const { q, estado, tipo, orden } = req.query as Record<string, string | undefined>;
+    const { q, estado, tipo, orden, estado_objetivo, estado_auto } = req.query as Record<string, string | undefined>;
     const params: unknown[] = [];
     let where = "true";
     if (q) {
@@ -193,6 +193,17 @@ pokemon.get("/ataques", async (req, res, next) => {
     if (estado === "activo" || estado === "inactivo") {
       params.push(estado === "activo");
       where += ` and a.activo = $${params.length}`;
+    }
+    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    for (const [valor, columna] of [
+      [estado_objetivo, "a.estado_objetivo_id"],
+      [estado_auto, "a.estado_auto_id"],
+    ] as const) {
+      if (valor === "ninguno") where += ` and ${columna} is null`;
+      else if (valor && uuid.test(valor)) {
+        params.push(valor);
+        where += ` and ${columna} = $${params.length}`;
+      }
     }
     if (tipo && Number.isInteger(Number(tipo))) {
       params.push(Number(tipo));
