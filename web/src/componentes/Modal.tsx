@@ -6,11 +6,15 @@ export default function Modal({
   titulo,
   onCerrar,
   children,
+  className,
+  sinTitulo,
 }: {
   abierto: boolean;
   titulo: string;
   onCerrar: () => void;
   children: ReactNode;
+  className?: string;
+  sinTitulo?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -26,7 +30,7 @@ export default function Modal({
   return (
     <dialog
       ref={ref}
-      className="modal"
+      className={className ? `modal ${className}` : "modal"}
       aria-label={titulo}
       onClose={onCerrar}
       onClick={(e) => {
@@ -37,7 +41,7 @@ export default function Modal({
         }
       }}
     >
-      <h3>{titulo}</h3>
+      {!sinTitulo && <h3>{titulo}</h3>}
       {children}
     </dialog>
   );

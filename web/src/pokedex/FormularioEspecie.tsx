@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   api,
   ErrorApi,
@@ -8,6 +8,8 @@ import {
   type TipoGimnasio,
 } from "../api";
 import Modal from "../componentes/Modal";
+import BadgeTipo from "./BadgeTipo";
+import { formatearDex } from "./tipos";
 
 interface FormEspecie {
   dex: string;
@@ -104,6 +106,8 @@ export default function FormularioEspecie({
   const [form, setForm] = useState<FormEspecie>(() => formInicial(especie, tipos[0]?.id ?? 12));
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [spriteRoto, setSpriteRoto] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   async function guardar() {
     setOcupado(true);
@@ -174,127 +178,203 @@ export default function FormularioEspecie({
     </label>
   );
 
+  const nombreTipo = (id: number) => tipos.find((t) => t.id === id)?.nombre ?? String(id);
+  const dexNum = Number(form.dex);
+  const titulo = especie === "nuevo" ? "Nueva especie" : `Editar ${especie.nombre}`;
+
+  function probarGrito() {
+    if (!form.grito_url) return;
+    audioRef.current?.pause();
+    audioRef.current = new Audio(form.grito_url);
+    void audioRef.current.play().catch(() => undefined);
+  }
+
   return (
-    <Modal
-      abierto
-      titulo={especie === "nuevo" ? "Nueva especie" : `Editar ${especie.nombre}`}
-      onCerrar={onCerrar}
-    >
+    <Modal abierto titulo={titulo} onCerrar={onCerrar} className="modal-pokedex" sinTitulo>
+      <div className="modal-pokedex-cabecera">
+        <div className="pokedex-leds" aria-hidden="true">
+          <span className="led grande" />
+          <span className="led rojo" />
+          <span className="led amarillo" />
+          <span className="led verde" />
+        </div>
+        <h3 className="pokedex-titulo">{titulo}</h3>
+        <button type="button" className="modal-pokedex-cerrar" onClick={onCerrar} aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
       {error && (
         <div className="aviso-error" role="alert">
           {error}
         </div>
       )}
       <form
+        className="modal-pokedex-form"
         onSubmit={(e) => {
           e.preventDefault();
           void guardar();
         }}
       >
-        <div className="editor-fila">
-          {campoNumero("dex", "Dex nacional", 0.01, 99999.99, "0.01")}
-          <label>
-            Nombre
-            <input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required maxLength={100} />
-          </label>
-        </div>
-        <div className="editor-fila">
-          <label>
-            Tipo I
-            <select
-              value={form.tipo_i}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                setForm({
-                  ...form,
-                  tipo_i: v,
-                  tipo_ii: String(form.tipo_ii) === String(v) ? "" : form.tipo_ii,
-                });
-              }}
-            >
+        <div className="pokedex-pantalla">
+          <div className="pokedex-previa" aria-label="Vista previa">
+            <div className="pokedex-previa-sprite">
+              {form.sprite_url && !spriteRoto ? (
+                <img src={form.sprite_url} alt="" onError={() => setSpriteRoto(true)} />
+              ) : (
+                "?"
+              )}
+            </div>
+            <div className="pokedex-previa-datos">
+              <span className="pokedex-previa-dex">{Number.isFinite(dexNum) && form.dex !== "" ? formatearDex(dexNum) : "#----"}</span>
+              <span className="pokedex-previa-nombre">{form.nombre || "Sin nombre"}</span>
+              <div className="pokedex-previa-tipos">
+                <BadgeTipo id={form.tipo_i} nombre={nombreTipo(form.tipo_i)} />
+                {form.tipo_ii !== "" && <BadgeTipo id={Number(form.tipo_ii)} nombre={nombreTipo(Number(form.tipo_ii))} />}
+              </div>
+            </div>
+          </div>
+
+          <fieldset className="pokedex-campos">
+            <legend>Identidad</legend>
+            {campoNumero("dex", "Dex nacional", 0.01, 99999.99, "0.01")}
+            <label>
+              Nombre
+              <input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required maxLength={100} />
+            </label>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Tipos</legend>
+            <label>
+              Tipo I
+              <select
+                value={form.tipo_i}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  setForm({
+                    ...form,
+                    tipo_i: v,
+                    tipo_ii: String(form.tipo_ii) === String(v) ? "" : form.tipo_ii,
+                  });
+                }}
+              >
+                {tipos.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Tipo II
+              <select value={form.tipo_ii} onChange={(e) => setForm({ ...form, tipo_ii: e.target.value })}>
+                <option value="">Ninguno</option>
+                {tipos.filter((t) => t.id !== form.tipo_i).map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Datos de juego</legend>
+            {campoNumero("hp", "HP", 0, 99)}
+            {campoNumero("iniciativa", "Iniciativa", 0, 99)}
+            {campoNumero("puntos_evolucion", "Puntos evolución", 0, 99)}
+            <label className="ancho-completo">
+              Ataque inicial
+              <select value={form.ataque_inicial_id} onChange={(e) => setForm({ ...form, ataque_inicial_id: e.target.value })}>
+                <option value="">Ninguno</option>
+                {ataques.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Tipos de ataque compatibles (máx. 4)</legend>
+            <div className="pokedex-checks">
               {tipos.map((t) => (
-                <option key={t.id} value={t.id}>
+                <label key={t.id} className="check">
+                  <input
+                    type="checkbox"
+                    checked={form.tipos_ataque.has(t.id)}
+                    onChange={() =>
+                      alternar(form.tipos_ataque, t.id, (s) => {
+                        if (s.size <= 4) setForm({ ...form, tipos_ataque: s });
+                      })
+                    }
+                  />
                   {t.nombre}
-                </option>
+                </label>
               ))}
-            </select>
-          </label>
-          <label>
-            Tipo II
-            <select value={form.tipo_ii} onChange={(e) => setForm({ ...form, tipo_ii: e.target.value })}>
-              <option value="">Ninguno</option>
-              {tipos.filter((t) => t.id !== form.tipo_i).map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.nombre}
-                </option>
+            </div>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Categorías</legend>
+            <div className="pokedex-checks">
+              {categorias.map((c) => (
+                <label key={c.id} className="check">
+                  <input
+                    type="checkbox"
+                    checked={form.categorias.has(c.id)}
+                    onChange={() => alternar(form.categorias, c.id, (s) => setForm({ ...form, categorias: s }))}
+                  />
+                  {c.nombre}
+                </label>
               ))}
-            </select>
-          </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Evolución</legend>
+            {campoTexto("preevolucion", "PreEvolución", 100)}
+            {campoTexto("evolucion", "Evolución", 100)}
+            {campoTexto("etapa", "Etapa", 100)}
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Multimedia</legend>
+            <div className="ancho-completo">
+              <label>
+                Sprite URL
+                <input
+                  value={form.sprite_url}
+                  maxLength={500}
+                  onChange={(e) => {
+                    setSpriteRoto(false);
+                    setForm({ ...form, sprite_url: e.target.value });
+                  }}
+                />
+              </label>
+            </div>
+            <div className="ancho-completo pokedex-fila-audio">
+              {campoTexto("grito_url", "Grito URL", 500)}
+              <button type="button" onClick={probarGrito} disabled={!form.grito_url} aria-label="Probar grito">
+                ▶
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Generación y probabilidades</legend>
+            {campoNumero("generacion", "Generación", 0, 99)}
+            {campoNumero("prob_aparicion", "Prob. aparición (%)", 0, 100, "0.1")}
+            {campoNumero("prob_shiny", "Prob. shiny (%)", 0, 100, "0.1")}
+          </fieldset>
         </div>
-        <div className="editor-fila">
-          {campoNumero("hp", "HP", 0, 99)}
-          {campoNumero("iniciativa", "Iniciativa", 0, 99)}
-          {campoNumero("puntos_evolucion", "Puntos evolución", 0, 99)}
-        </div>
-        <label>
-          Ataque inicial
-          <select value={form.ataque_inicial_id} onChange={(e) => setForm({ ...form, ataque_inicial_id: e.target.value })}>
-            <option value="">Ninguno</option>
-            {ataques.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.nombre}
-              </option>
-            ))}
-          </select>
-        </label>
-        <fieldset>
-          <legend>Tipos de ataque compatibles (máx. 4)</legend>
-          {tipos.map((t) => (
-            <label key={t.id} className="check">
-              <input
-                type="checkbox"
-                checked={form.tipos_ataque.has(t.id)}
-                onChange={() =>
-                  alternar(form.tipos_ataque, t.id, (s) => {
-                    if (s.size <= 4) setForm({ ...form, tipos_ataque: s });
-                  })
-                }
-              />
-              {t.nombre}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>Categorías</legend>
-          {categorias.map((c) => (
-            <label key={c.id} className="check">
-              <input
-                type="checkbox"
-                checked={form.categorias.has(c.id)}
-                onChange={() => alternar(form.categorias, c.id, (s) => setForm({ ...form, categorias: s }))}
-              />
-              {c.nombre}
-            </label>
-          ))}
-        </fieldset>
-        <div className="editor-fila">
-          {campoTexto("preevolucion", "PreEvolución", 100)}
-          {campoTexto("evolucion", "Evolución", 100)}
-          {campoTexto("etapa", "Etapa", 100)}
-        </div>
-        {campoTexto("sprite_url", "Sprite URL", 500)}
-        {campoTexto("grito_url", "Grito URL", 500)}
-        <div className="editor-fila">
-          {campoNumero("generacion", "Generación", 0, 99)}
-          {campoNumero("prob_aparicion", "Prob. aparición (%)", 0, 100, "0.1")}
-          {campoNumero("prob_shiny", "Prob. shiny (%)", 0, 100, "0.1")}
-        </div>
-        <div className="editor-fila">
-          <button type="submit" disabled={ocupado}>
-            Guardar
-          </button>
-          <button type="button" onClick={onCerrar}>
+        <div className="modal-pokedex-pie">
+          <button type="button" className="cancelar" onClick={onCerrar}>
             Cancelar
+          </button>
+          <button type="submit" className="guardar" disabled={ocupado}>
+            Guardar
           </button>
         </div>
       </form>
