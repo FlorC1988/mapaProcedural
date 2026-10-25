@@ -88,18 +88,31 @@ try {
     const nombre = norm(f[0]);
     if (!nombre) continue;
     const r = await client.query(
-      `insert into public.ataques (nombre, tipo_id, descripcion, danio, estado_objetivo_id, estado_auto_id)
-       values ($1,$2,$3,$4,$5,$6) returning id`,
+      `insert into public.ataques (nombre, tipo_id, descripcion, danio)
+       values ($1,$2,$3,$4) returning id`,
       [
         nombre,
         tipoId(f[1], `ataque "${nombre}"`),
         norm(f[2]),
         num(f[3]),
-        estadoIds.get(norm(f[4]).toLowerCase()) ?? null,
-        estadoIds.get(norm(f[5]).toLowerCase()) ?? null,
       ],
     );
-    ataqueIds.set(nombre.toLowerCase(), r.rows[0].id);
+    const ataqueId = r.rows[0].id;
+    const estadoObjId = estadoIds.get(norm(f[4]).toLowerCase());
+    if (estadoObjId) {
+      await client.query(
+        `insert into public.ataque_estados (ataque_id, estado_id, ambito) values ($1,$2,'objetivo')`,
+        [ataqueId, estadoObjId]
+      );
+    }
+    const estadoAutoId = estadoIds.get(norm(f[5]).toLowerCase());
+    if (estadoAutoId) {
+      await client.query(
+        `insert into public.ataque_estados (ataque_id, estado_id, ambito) values ($1,$2,'usuario')`,
+        [ataqueId, estadoAutoId]
+      );
+    }
+    ataqueIds.set(nombre.toLowerCase(), ataqueId);
     atq++;
   }
   console.log(`ataques: ${atq}`);

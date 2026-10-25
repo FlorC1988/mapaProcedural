@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { PoolClient } from "pg";
 import { pool } from "../db.js";
 
 // Catálogos de la expansión Pokémon (docs/13-expansion-pokemon.md).
@@ -69,7 +70,7 @@ pokemon.put("/estados-alterados/:id", async (req, res, next) => {
     }
     if (activo === false) {
       const { rows: usos } = await pool.query(
-        `select 1 from ataques where activo and (estado_objetivo_id = $1 or estado_auto_id = $1) limit 1`,
+        `select 1 from ataque_estados ae join ataques a on a.id = ae.ataque_id where a.activo and ae.estado_id = $1 limit 1`,
         [id]
       );
       if (usos.length > 0) {
@@ -195,14 +196,15 @@ pokemon.get("/ataques", async (req, res, next) => {
       where += ` and a.activo = $${params.length}`;
     }
     const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    for (const [valor, columna] of [
-      [estado_objetivo, "a.estado_objetivo_id"],
-      [estado_auto, "a.estado_auto_id"],
+    for (const [valor, ambito] of [
+      [estado_objetivo, "objetivo"],
+      [estado_auto, "usuario"],
     ] as const) {
-      if (valor === "ninguno") where += ` and ${columna} is null`;
-      else if (valor && uuid.test(valor)) {
+      if (valor === "ninguno") {
+        where += ` and not exists (select 1 from ataque_estados ae where ae.ataque_id = a.id and ae.ambito = '${ambito}')`;
+      } else if (valor && uuid.test(valor)) {
         params.push(valor);
-        where += ` and ${columna} = $${params.length}`;
+        where += ` and exists (select 1 from ataque_estados ae where ae.ataque_id = a.id and ae.estado_id = $${params.length} and ae.ambito = '${ambito}')`;
       }
     }
     if (tipo && Number.isInteger(Number(tipo))) {
@@ -212,7 +214,11 @@ pokemon.get("/ataques", async (req, res, next) => {
     const dir = orden === "desc" ? "desc" : "asc";
     const { rows } = await pool.query(
       `select a.id, a.nombre::text as nombre, a.tipo_id, a.descripcion, a.danio,
-              a.estado_objetivo_id, a.estado_auto_id, a.activo, a.version,
+              coalesce((select array_agg(ae.estado_id) from ataque_estados ae
+                        where ae.ataque_id = a.id and ae.ambito = 'objetivo'), '{}') as estados_objetivo,
+              coalesce((select array_agg(ae.estado_id) from ataque_estados ae
+                        where ae.ataque_id = a.id and ae.ambito = 'usuario'), '{}') as estados_auto,
+              a.activo, a.version,
               creado_en as "creadoEn", modificado_en as "modificadoEn"
        from ataques a where ${where} order by a.nombre ${dir}`,
       params
@@ -223,6 +229,19 @@ pokemon.get("/ataques", async (req, res, next) => {
   }
 });
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function esArrayDeUuid(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every((x) => typeof x === "string" && UUID_RE.test(x));
+}
+
+function estadosValidos(b: Record<string, unknown>): { objetivo: string[]; auto: string[] } | null {
+  const objetivo = Array.isArray(b.estados_objetivo) ? (b.estados_objetivo as unknown[]) : [];
+  const auto = Array.isArray(b.estados_auto) ? (b.estados_auto as unknown[]) : [];
+  if (!esArrayDeUuid(objetivo) || !esArrayDeUuid(auto)) return null;
+  return { objetivo, auto };
+}
+
 function validarAtaque(b: Record<string, unknown>): string | null {
   const n = esTexto(b.nombre) ? b.nombre.trim() : "";
   if (!NOMBRE_RE.test(n)) return "parametros_invalidos";
@@ -231,8 +250,24 @@ function validarAtaque(b: Record<string, unknown>): string | null {
   if (b.danio !== null && !(Number.isInteger(b.danio) && (b.danio as number) >= 0 && (b.danio as number) <= 99)) {
     return "parametros_invalidos";
   }
-  if (!esTextoONulo(b.estado_objetivo_id) || !esTextoONulo(b.estado_auto_id)) return "parametros_invalidos";
+  if (estadosValidos(b) === null) return "parametros_invalidos";
   return null;
+}
+
+async function guardarEstadosAtaque(cliente: PoolClient, ataqueId: string, estados: { objetivo: string[]; auto: string[] }) {
+  await cliente.query(`delete from ataque_estados where ataque_id = $1`, [ataqueId]);
+  for (const estadoId of new Set(estados.objetivo)) {
+    await cliente.query(
+      `insert into ataque_estados (ataque_id, estado_id, ambito) values ($1,$2,'objetivo')`,
+      [ataqueId, estadoId]
+    );
+  }
+  for (const estadoId of new Set(estados.auto)) {
+    await cliente.query(
+      `insert into ataque_estados (ataque_id, estado_id, ambito) values ($1,$2,'usuario')`,
+      [ataqueId, estadoId]
+    );
+  }
 }
 
 pokemon.post("/ataques", async (req, res, next) => {
@@ -240,20 +275,29 @@ pokemon.post("/ataques", async (req, res, next) => {
     const b = req.body ?? {};
     const error = validarAtaque(b);
     if (error) return res.status(400).json({ causa: error });
+    const estados = estadosValidos(b)!;
+    const cliente = await pool.connect();
     try {
+      await cliente.query("begin");
       const { rows } = await pool.query(
-        `insert into ataques (nombre, tipo_id, descripcion, danio, estado_objetivo_id, estado_auto_id)
-         values ($1,$2,$3,$4,$5,$6) returning id`,
-        [b.nombre.trim(), b.tipo_id, b.descripcion, b.danio ?? null, b.estado_objetivo_id ?? null, b.estado_auto_id ?? null]
+        `insert into ataques (nombre, tipo_id, descripcion, danio)
+         values ($1,$2,$3,$4) returning id`,
+        [b.nombre.trim(), b.tipo_id, b.descripcion, b.danio ?? null]
       );
-      await auditar("ataque", rows[0].id, "creacion");
-      res.status(201).json({ id: rows[0].id });
+      const id = rows[0].id as string;
+      await guardarEstadosAtaque(cliente, id, estados);
+      await cliente.query("commit");
+      await auditar("ataque", id, "creacion");
+      res.status(201).json({ id });
     } catch (e) {
+      await cliente.query("rollback");
       if (esViolacionUnica(e)) return res.status(409).json({ causa: "nombre_duplicado" });
       if (typeof e === "object" && e !== null && (e as { code?: string }).code === "23503") {
         return res.status(400).json({ causa: "referencia_invalida" });
       }
       throw e;
+    } finally {
+      cliente.release();
     }
   } catch (e) {
     next(e);
@@ -277,28 +321,35 @@ pokemon.put("/ataques/:id", async (req, res, next) => {
         return res.status(409).json({ causa: "ataque_en_uso", accion: "El ataque es ataque inicial de una especie activa." });
       }
     }
+    const estados = estadosValidos(b)!;
+    const cliente = await pool.connect();
     try {
-      const { rows } = await pool.query(
+      await cliente.query("begin");
+      const { rows } = await cliente.query(
         `update ataques set nombre = $1, tipo_id = $2, descripcion = $3, danio = $4,
-                estado_objetivo_id = $5, estado_auto_id = $6, activo = $7,
-                version = version + 1, modificado_en = now()
-         where id = $8 and version = $9 returning version`,
-        [b.nombre.trim(), b.tipo_id, b.descripcion, b.danio ?? null,
-         b.estado_objetivo_id ?? null, b.estado_auto_id ?? null, b.activo, id, b.version]
+                activo = $5, version = version + 1, modificado_en = now()
+         where id = $6 and version = $7 returning version`,
+        [b.nombre.trim(), b.tipo_id, b.descripcion, b.danio ?? null, b.activo, id, b.version]
       );
       if (rows.length === 0) {
+        await cliente.query("rollback");
         const { rowCount } = await pool.query(`select 1 from ataques where id = $1`, [id]);
         if (rowCount === 0) return res.status(404).json({ causa: "no_encontrado" });
         return res.status(409).json({ causa: "conflicto_version", accion: "El ataque cambió desde que se abrió; recargá antes de guardar." });
       }
+      await guardarEstadosAtaque(cliente, id, estados);
+      await cliente.query("commit");
       await auditar("ataque", id, "edicion");
       res.json({ version: rows[0].version });
     } catch (e) {
+      await cliente.query("rollback");
       if (esViolacionUnica(e)) return res.status(409).json({ causa: "nombre_duplicado" });
       if (typeof e === "object" && e !== null && (e as { code?: string }).code === "23503") {
         return res.status(400).json({ causa: "referencia_invalida" });
       }
       throw e;
+    } finally {
+      cliente.release();
     }
   } catch (e) {
     next(e);

@@ -127,8 +127,8 @@ export interface Ataque {
   tipo_id: number;
   descripcion: string;
   danio: number | null;
-  estado_objetivo_id: string | null;
-  estado_auto_id: string | null;
+  estados_objetivo: string[];
+  estados_auto: string[];
   activo: boolean;
   version: number;
   creadoEn: string;

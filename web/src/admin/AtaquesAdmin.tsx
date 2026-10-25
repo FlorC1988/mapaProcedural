@@ -7,8 +7,8 @@ interface FormAtaque {
   tipo_id: number;
   descripcion: string;
   danio: string;
-  estado_objetivo_id: string;
-  estado_auto_id: string;
+  estados_objetivo: Set<string>;
+  estados_auto: Set<string>;
 }
 
 const FORM_VACIO: FormAtaque = {
@@ -16,8 +16,8 @@ const FORM_VACIO: FormAtaque = {
   tipo_id: 12,
   descripcion: "",
   danio: "",
-  estado_objetivo_id: "",
-  estado_auto_id: "",
+  estados_objetivo: new Set(),
+  estados_auto: new Set(),
 };
 
 export default function AtaquesAdmin({
@@ -46,7 +46,10 @@ export default function AtaquesAdmin({
   useEffect(cargar, [filtros]);
 
   const nombreTipo = (id: number) => tipos.find((t) => t.id === id)?.nombre ?? String(id);
-  const nombreEstado = (id: string | null) => (id ? estados.find((e) => e.id === id)?.nombre ?? "—" : "—");
+  const nombresEstados = (ids: string[]) =>
+    ids.length === 0
+      ? "—"
+      : ids.map((id) => estados.find((e) => e.id === id)?.nombre ?? id).join(", ");
 
   function abrirEdicion(a: Ataque) {
     setEditando(a);
@@ -55,8 +58,8 @@ export default function AtaquesAdmin({
       tipo_id: a.tipo_id,
       descripcion: a.descripcion,
       danio: a.danio == null ? "" : String(a.danio),
-      estado_objetivo_id: a.estado_objetivo_id ?? "",
-      estado_auto_id: a.estado_auto_id ?? "",
+      estados_objetivo: new Set(a.estados_objetivo),
+      estados_auto: new Set(a.estados_auto),
     });
     setError(null);
   }
@@ -69,8 +72,8 @@ export default function AtaquesAdmin({
       tipo_id: form.tipo_id,
       descripcion: form.descripcion,
       danio: form.danio === "" ? null : Number(form.danio),
-      estado_objetivo_id: form.estado_objetivo_id || null,
-      estado_auto_id: form.estado_auto_id || null,
+      estados_objetivo: [...form.estados_objetivo],
+      estados_auto: [...form.estados_auto],
     };
     try {
       if (editando === "nuevo") {
@@ -96,8 +99,8 @@ export default function AtaquesAdmin({
         tipo_id: a.tipo_id,
         descripcion: a.descripcion,
         danio: a.danio,
-        estado_objetivo_id: a.estado_objetivo_id,
-        estado_auto_id: a.estado_auto_id,
+        estados_objetivo: a.estados_objetivo,
+        estados_auto: a.estados_auto,
         activo: !a.activo,
         version: a.version,
       });
@@ -201,8 +204,8 @@ export default function AtaquesAdmin({
               <td>{a.nombre}</td>
               <td>{nombreTipo(a.tipo_id)}</td>
               <td>{a.danio ?? "?"}</td>
-              <td>{nombreEstado(a.estado_objetivo_id)}</td>
-              <td>{nombreEstado(a.estado_auto_id)}</td>
+              <td>{nombresEstados(a.estados_objetivo)}</td>
+              <td>{nombresEstados(a.estados_auto)}</td>
               <td>{a.activo ? "Activo" : "Inactivo"}</td>
               <td className="acciones">
                 <button type="button" onClick={() => abrirEdicion(a)}>
@@ -250,28 +253,46 @@ export default function AtaquesAdmin({
               Daño
               <input type="number" min={0} max={99} value={form.danio} onChange={(e) => setForm({ ...form, danio: e.target.value })} />
             </label>
-            <label>
-              Estado sobre el objetivo
-              <select value={form.estado_objetivo_id} onChange={(e) => setForm({ ...form, estado_objetivo_id: e.target.value })}>
-                <option value="">Ninguno</option>
+            <fieldset>
+              <legend>Estados sobre el objetivo</legend>
+              <div className="pokedex-checks">
                 {estados.filter((s) => s.activo).map((s) => (
-                  <option key={s.id} value={s.id}>
+                  <label key={s.id} className="check">
+                    <input
+                      type="checkbox"
+                      checked={form.estados_objetivo.has(s.id)}
+                      onChange={() => {
+                        const nuevo = new Set(form.estados_objetivo);
+                        if (nuevo.has(s.id)) nuevo.delete(s.id);
+                        else nuevo.add(s.id);
+                        setForm({ ...form, estados_objetivo: nuevo });
+                      }}
+                    />
                     {s.nombre}
-                  </option>
+                  </label>
                 ))}
-              </select>
-            </label>
-            <label>
-              Estado sobre el usuario
-              <select value={form.estado_auto_id} onChange={(e) => setForm({ ...form, estado_auto_id: e.target.value })}>
-                <option value="">Ninguno</option>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Estados sobre el usuario</legend>
+              <div className="pokedex-checks">
                 {estados.filter((s) => s.activo).map((s) => (
-                  <option key={s.id} value={s.id}>
+                  <label key={s.id} className="check">
+                    <input
+                      type="checkbox"
+                      checked={form.estados_auto.has(s.id)}
+                      onChange={() => {
+                        const nuevo = new Set(form.estados_auto);
+                        if (nuevo.has(s.id)) nuevo.delete(s.id);
+                        else nuevo.add(s.id);
+                        setForm({ ...form, estados_auto: nuevo });
+                      }}
+                    />
                     {s.nombre}
-                  </option>
+                  </label>
                 ))}
-              </select>
-            </label>
+              </div>
+            </fieldset>
             <div className="editor-fila">
               <button type="submit" disabled={ocupado}>
                 Guardar

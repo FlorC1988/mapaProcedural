@@ -96,11 +96,11 @@ Ataque
 ├── tipo elemental
 ├── descripción del efecto
 ├── daño base
-├── estado sobre el objetivo (opcional)
-└── estado sobre el usuario (opcional)
+├── estados sobre el objetivo (conjunto de 0..N)
+└── estados sobre el usuario (conjunto de 0..N)
 ```
 
-Los estados alterados se modelan como catálogo normativo propio (entidad Estado con identidad y nombre único); los campos de estado sobre objetivo y sobre usuario lo referencian (`DEC-097`).
+Los estados alterados se modelan como catálogo normativo propio (entidad Estado con identidad y nombre único); un ataque puede referenciar varios estados en cada ámbito mediante la tabla de unión `ataque_estados` (`DEC-097`, `DEC-105`). La fuente xlsx aporta como máximo un estado por ámbito; la interfaz de administración permite asociar varios.
 
 ### 3.3. Tipo elemental — Aprobado
 
