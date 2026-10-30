@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MapaGenerado } from "../api";
+import EncuentroPokemon from "./EncuentroPokemon";
 
 // Visualización del tablero (DEC-060/061/062):
 // - hexágonos flat-top, columnas visibles pares desplazadas medio hexágono abajo
@@ -361,6 +362,13 @@ export default function Tablero({
             </dl>
           ) : (
             <p>Seleccioná una celda para ver su detalle.</p>
+          )}
+          {celdaSel && (
+            <EncuentroPokemon
+              biomaId={celdaSel.bioma}
+              biomaNombre={biomaPorId.get(celdaSel.bioma)?.nombre ?? celdaSel.bioma}
+              tipos={tipos}
+            />
           )}
         </aside>
       </div>

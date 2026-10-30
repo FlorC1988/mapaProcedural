@@ -109,23 +109,19 @@ export default function VistaMapa({
   }
 
   function deshacer() {
-    setPasados((p) => {
-      if (p.length === 0) return p;
-      const anterior = p[p.length - 1];
-      setFuturos((f) => [mapa, ...f]);
-      onCambio({ ...datos, mapa: anterior });
-      return p.slice(0, -1);
-    });
+    if (pasados.length === 0) return;
+    const anterior = pasados[pasados.length - 1];
+    setPasados(pasados.slice(0, -1));
+    setFuturos([mapa, ...futuros]);
+    onCambio({ ...datos, mapa: anterior });
   }
 
   function rehacer() {
-    setFuturos((f) => {
-      if (f.length === 0) return f;
-      const siguiente = f[0];
-      setPasados((p) => [...p, mapa]);
-      onCambio({ ...datos, mapa: siguiente });
-      return f.slice(1);
-    });
+    if (futuros.length === 0) return;
+    const siguiente = futuros[0];
+    setFuturos(futuros.slice(1));
+    setPasados([...pasados, mapa]);
+    onCambio({ ...datos, mapa: siguiente });
   }
 
   useEffect(() => {

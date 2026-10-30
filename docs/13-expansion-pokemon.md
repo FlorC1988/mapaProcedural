@@ -121,6 +121,17 @@ Una especie es elegible para un bioma cuando su Type I coincide con algún tipo 
 
 Materialización (`DEC-098`): la aparición es un **cálculo derivado a demanda**. Al consultar un mapa se computan las especies elegibles para cada bioma presente; no se asignan especies a celdas, no interviene la generación, no consume presupuesto ni semilla y no forma parte del snapshot ni del contexto histórico. La consulta refleja siempre el estado actual de los catálogos. Una especie cuyo tipo no está habilitado en ningún bioma simplemente no aparece en ninguna consulta, y un bioma sin tipos habilitados produce una lista vacía.
 
+### 4.1. Encuentro desde una celda — Aprobado (`DEC-106`)
+
+El panel de detalle de una celda ofrece el botón "Buscar pokémon". Al pulsarlo:
+
+1. se calculan a demanda las especies **activas** elegibles para el bioma de la celda que tienen `prob_aparicion > 0`; las especies sin probabilidad cargada no participan;
+2. se sortea una especie ponderando por `prob_aparicion` (rareza relativa entre las candidatas);
+3. se tira `prob_shiny`: si es nula, la especie nunca sale shiny; si sale, se muestra el sprite shiny de PokéAPI;
+4. el resultado se muestra en un modal con sprite, número de dex, nombre, tipos y grito, y se puede volver a sortear.
+
+El encuentro es efímero: no se asigna a la celda, no se persiste, no forma parte del snapshot ni usa la semilla del mapa (`DEC-098`, `DEC-102`). Si el bioma no tiene tipos habilitados o ninguna especie candidata tiene probabilidad, el modal lo informa. Los gimnasios no intervienen mientras `DEC-099` siga pendiente.
+
 ## 5. Pokémon en gimnasios — Pendiente (`DEC-099`)
 
 La generación de pokémon de los gimnasios queda **aplazada a una etapa posterior**. Cuando se aborde, `DEC-099` definirá:
@@ -164,6 +175,7 @@ Prefijos: `RF-PKM` (especies), `RF-ATQ` (ataques), `RF-ENC` (aparición), `RF-GY
 - **RF-ATQ-003 — Aprobado:** existirá un catálogo normativo de estados alterados con identidad y nombre único, administrable con las mismas reglas que el resto de catálogos.
 - **RF-ENC-001 — Aprobado:** un administrador podrá administrar qué tipos elementales son elegibles para aparecer en cada bioma, indicando por tipo si la elegibilidad incluye también a las especies que lo tienen como Type II.
 - **RF-ENC-002 — Aprobado:** la consulta de un mapa mostrará, calculado a demanda, el conjunto de especies activas elegibles por cada bioma presente, según el mecanismo de la sección 4 (`DEC-098`); no habrá asignación de especies a celdas.
+- **RF-ENC-003 — Aprobado:** desde el detalle de una celda se podrá solicitar un encuentro aleatorio, que sortea una especie activa elegible para el bioma de la celda con probabilidad de aparición cargada, ponderada por esa probabilidad, con tirada de shiny; el encuentro no se persiste (`DEC-106`).
 - **RF-GYM-P-001 — Pendiente:** (según `DEC-099`) cada gimnasio podrá mostrar o recibir especies asociadas a su tipo elemental.
 - **RF-PKM-004 — Aprobado:** las escrituras sobre especies, ataques y apariciones serán atómicas, con concurrencia optimista y registro en auditoría administrativa.
 - **RF-PKM-005 — Aprobado:** los cambios de los catálogos Pokémon no alterarán mapas ni snapshots existentes.
@@ -186,3 +198,5 @@ Prefijos: `RF-PKM` (especies), `RF-ATQ` (ataques), `RF-ENC` (aparición), `RF-GY
 | DEC-102 | Sin reproducibilidad para datos Pokémon — **Aprobada** |
 | DEC-103 | PokéAPI como fuente externa — **Aprobada** |
 | DEC-104 | Categorías multivalor de Especie (enmienda DEC-095) — **Aprobada** |
+| DEC-105 | Estados alterados múltiples por ataque (enmienda DEC-097) — **Aprobada** |
+| DEC-106 | Encuentro Pokémon desde una celda — **Aprobada** |

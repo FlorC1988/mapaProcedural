@@ -167,6 +167,23 @@ export interface AparicionBioma {
   incluyeTipoII: boolean;
 }
 
+export interface EspecieElegible {
+  id: string;
+  dex: number;
+  nombre: string;
+  tipo_i: number;
+  tipo_ii: number | null;
+  sprite_url: string | null;
+  grito_url: string | null;
+  prob_aparicion: number;
+  prob_shiny: number | null;
+}
+
+export interface RespuestaElegibles {
+  tiposHabilitados: number;
+  especies: EspecieElegible[];
+}
+
 export class ErrorApi extends Error {
   constructor(
     public causa: string,
@@ -327,6 +344,8 @@ export const api = {
       body: JSON.stringify(datos),
     }),
   apariciones: () => pedir<AparicionBioma[]>("/api/apariciones"),
+  especiesElegibles: (biomaId: string) =>
+    pedir<RespuestaElegibles>(`/api/apariciones/elegibles?bioma=${encodeURIComponent(biomaId)}`),
   actualizarApariciones: (biomaId: string, tipos: { tipo_id: number; incluyeTipoII: boolean }[]) =>
     pedir<{ ok: true }>(`/api/apariciones/${biomaId}`, {
       method: "PUT",

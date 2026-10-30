@@ -27,6 +27,10 @@ supabase/snippets/
 coverage/
 .nyc_output/
 
+# Playwright
+playwright-report/
+test-results/
+
 # OS / IDE files
 .DS_Store
 Thumbs.db

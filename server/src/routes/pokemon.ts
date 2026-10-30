@@ -279,7 +279,7 @@ pokemon.post("/ataques", async (req, res, next) => {
     const cliente = await pool.connect();
     try {
       await cliente.query("begin");
-      const { rows } = await pool.query(
+      const { rows } = await cliente.query(
         `insert into ataques (nombre, tipo_id, descripcion, danio)
          values ($1,$2,$3,$4) returning id`,
         [b.nombre.trim(), b.tipo_id, b.descripcion, b.danio ?? null]
@@ -361,10 +361,11 @@ pokemon.put("/ataques/:id", async (req, res, next) => {
 // ---------------------------------------------------------------------------
 
 const SELECT_ESPECIE = `
-  select e.id, e.dex, e.nombre::text as nombre, e.tipo_i, e.tipo_ii,
+  select e.id, e.dex::float8 as dex, e.nombre::text as nombre, e.tipo_i, e.tipo_ii,
          e.hp, e.iniciativa, e.puntos_evolucion, e.ataque_inicial_id,
          e.preevolucion, e.evolucion, e.etapa, e.sprite_url, e.grito_url,
-         e.generacion, e.prob_aparicion, e.prob_shiny,
+         e.generacion, e.prob_aparicion::float8 as prob_aparicion,
+         e.prob_shiny::float8 as prob_shiny,
          e.activo, e.version, e.creado_en as "creadoEn", e.modificado_en as "modificadoEn",
          coalesce((select array_agg(ec.categoria_id) from especie_categorias ec
                    where ec.especie_id = e.id), '{}') as categorias,
@@ -559,6 +560,37 @@ pokemon.get("/apariciones", async (_req, res, next) => {
        from aparicion_bioma order by bioma_id, tipo_id`
     );
     res.json(rows);
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Especies elegibles para un encuentro en un bioma (DEC-106): activas, con
+// probabilidad de aparición cargada y con Type I habilitado en el bioma, o
+// Type II si el bioma lo incluye. Cálculo a demanda (DEC-098).
+pokemon.get("/apariciones/elegibles", async (req, res, next) => {
+  try {
+    const bioma = typeof req.query.bioma === "string" ? req.query.bioma : "";
+    if (!UUID_RE.test(bioma)) return res.status(400).json({ causa: "parametros_invalidos" });
+    const { rowCount: existe } = await pool.query(`select 1 from biomas where id = $1`, [bioma]);
+    if (existe === 0) return res.status(404).json({ causa: "no_encontrado" });
+    const { rows: tipos } = await pool.query(
+      `select count(*)::int as n from aparicion_bioma where bioma_id = $1`,
+      [bioma]
+    );
+    const { rows: especies } = await pool.query(
+      `select e.id, e.dex::float8 as dex, e.nombre::text as nombre, e.tipo_i, e.tipo_ii,
+              e.sprite_url, e.grito_url,
+              e.prob_aparicion::float8 as prob_aparicion, e.prob_shiny::float8 as prob_shiny
+       from especies e
+       where e.activo and e.prob_aparicion > 0
+         and exists (select 1 from aparicion_bioma ab
+                     where ab.bioma_id = $1
+                       and (ab.tipo_id = e.tipo_i or (ab.incluye_tipo_ii and ab.tipo_id = e.tipo_ii)))
+       order by e.dex`,
+      [bioma]
+    );
+    res.json({ tiposHabilitados: tipos[0].n, especies });
   } catch (e) {
     next(e);
   }

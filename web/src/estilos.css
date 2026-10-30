@@ -877,6 +877,53 @@ label.check {
   color: #e4e4e7;
 }
 
+/* --- Encuentro desde una celda (DEC-106) ----------------------------------- */
+
+.boton-encuentro {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.modal-encuentro {
+  min-width: min(20rem, 92vw);
+}
+
+.encuentro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.encuentro-sprite {
+  width: 9rem;
+  height: 9rem;
+  background: #f4f4f5;
+  border: 2px solid #d4d4d8;
+  border-radius: 0.5rem;
+}
+
+.encuentro-dex {
+  font-size: 0.8rem;
+  color: #71717a;
+  font-variant-numeric: tabular-nums;
+}
+
+.encuentro-nombre {
+  font-size: 1.3rem;
+}
+
+.encuentro-shiny {
+  color: #b45309;
+}
+
+.modal-encuentro .acciones {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 /* --- Modal Pokédex (edición de especie) ------------------------------------ */
 
 .modal-pokedex {

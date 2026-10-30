@@ -35,7 +35,7 @@ export function formatearDex(dex: number): string {
   const entero = Math.floor(dex);
   const decimal = Math.round((dex - entero) * 100);
   const base = `#${String(entero).padStart(4, "0")}`;
-  return decimal === 0 ? base : `${base}.${decimal}`;
+  return decimal === 0 ? base : `${base}.${String(decimal).replace(/0+$/, "")}`;
 }
 
 // Porcentaje con un decimal a partir de una probabilidad 0..1.
