@@ -111,7 +111,7 @@ test("DEC-106/DEC-107: buscar pokémon en una celda del bioma configurado muestr
   await expect(modal.locator(".encuentro-ataque")).toContainText("3 daño");
   await modal.getByRole("button", { name: "Buscar otro" }).click();
   await expect(modal.locator(".encuentro-nombre")).toBeVisible();
-  await modal.getByRole("button", { name: "Cerrar" }).click();
+  await modal.locator(".acciones").getByRole("button", { name: "Cerrar" }).click();
   await expect(modal).toBeHidden();
 
   await celda(page, 1, 3).click();
