@@ -314,7 +314,9 @@ pokemon.put("/ataques/:id", async (req, res, next) => {
     }
     if (b.activo === false) {
       const { rows: usos } = await pool.query(
-        `select 1 from especies where activo and ataque_inicial_id = $1 limit 1`,
+        `select 1 from especie_ataques_iniciales ai
+         join especies e on e.id = ai.especie_id
+         where e.activo and ai.ataque_id = $1 limit 1`,
         [id]
       );
       if (usos.length > 0) {
@@ -362,7 +364,13 @@ pokemon.put("/ataques/:id", async (req, res, next) => {
 
 const SELECT_ESPECIE = `
   select e.id, e.dex::float8 as dex, e.nombre::text as nombre, e.tipo_i, e.tipo_ii,
-         e.hp, e.iniciativa, e.puntos_evolucion, e.ataque_inicial_id,
+         e.hp, e.iniciativa, e.puntos_evolucion,
+         coalesce((select json_agg(json_build_object(
+                     'ataque_id', ai.ataque_id,
+                     'probabilidad', ai.probabilidad::float8)
+                   order by ai.ataque_id)
+                   from especie_ataques_iniciales ai
+                   where ai.especie_id = e.id), '[]') as ataques_iniciales,
          e.preevolucion, e.evolucion, e.etapa, e.sprite_url, e.grito_url,
          e.generacion, e.prob_aparicion::float8 as prob_aparicion,
          e.prob_shiny::float8 as prob_shiny,
@@ -443,7 +451,48 @@ function validarEspecie(b: Record<string, unknown>): string | null {
   if (!Array.isArray(b.categorias) || !b.categorias.every(esTexto)) return "parametros_invalidos";
   if (!Array.isArray(b.tipos_ataque) || (b.tipos_ataque as unknown[]).length > 4 ||
       !(b.tipos_ataque as unknown[]).every(esIdTipo)) return "parametros_invalidos";
-  if (!esTextoONulo(b.ataque_inicial_id)) return "parametros_invalidos";
+  if (!inicialesValidos(b.ataques_iniciales)) return "parametros_invalidos";
+  return null;
+}
+
+// Ataques iniciales de la especie (DEC-107): 0..4 sin duplicados, con
+// probabilidad como peso relativo (0 < p <= 1).
+function inicialesValidos(v: unknown): v is { ataque_id: string; probabilidad: number }[] {
+  if (!Array.isArray(v) || v.length > 4) return false;
+  const ids = new Set<string>();
+  return v.every((i) => {
+    const ok = esTexto(i?.ataque_id) && UUID_RE.test(i.ataque_id) &&
+      typeof i.probabilidad === "number" && i.probabilidad > 0 && i.probabilidad <= 1;
+    if (ok) ids.add(i.ataque_id);
+    return ok;
+  }) && ids.size === v.length;
+}
+
+// Inserta los ataques iniciales verificando que existan, estén activos y su
+// tipo esté entre los tipos de ataque compatibles de la especie (DEC-107).
+async function guardarAtaquesIniciales(
+  cliente: PoolClient,
+  especieId: string,
+  iniciales: { ataque_id: string; probabilidad: number }[],
+  tiposAtaque: number[]
+): Promise<string | null> {
+  if (iniciales.length === 0) return null;
+  const { rows: ataques } = await cliente.query(
+    `select id, tipo_id, activo from ataques where id = any($1::uuid[])`,
+    [iniciales.map((i) => i.ataque_id)]
+  );
+  const compatibles = new Set(tiposAtaque);
+  for (const ini of iniciales) {
+    const a = ataques.find((x: { id: string; tipo_id: number; activo: boolean }) => x.id === ini.ataque_id);
+    if (!a || !a.activo) return "referencia_invalida";
+    if (!compatibles.has(a.tipo_id)) return "tipo_ataque_incompatible";
+  }
+  for (const ini of iniciales) {
+    await cliente.query(
+      `insert into especie_ataques_iniciales (especie_id, ataque_id, probabilidad) values ($1,$2,$3)`,
+      [especieId, ini.ataque_id, ini.probabilidad]
+    );
+  }
   return null;
 }
 
@@ -457,11 +506,11 @@ pokemon.post("/especies", async (req, res, next) => {
       await cliente.query("begin");
       const { rows } = await cliente.query(
         `insert into especies (dex, nombre, tipo_i, tipo_ii, hp, iniciativa, puntos_evolucion,
-                               ataque_inicial_id, preevolucion, evolucion, etapa, sprite_url, grito_url,
+                               preevolucion, evolucion, etapa, sprite_url, grito_url,
                                generacion, prob_aparicion, prob_shiny)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning id`,
+         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning id`,
         [b.dex, b.nombre.trim(), b.tipo_i, b.tipo_ii ?? null, b.hp ?? null, b.iniciativa ?? null,
-         b.puntos_evolucion ?? null, b.ataque_inicial_id ?? null, b.preevolucion ?? null,
+         b.puntos_evolucion ?? null, b.preevolucion ?? null,
          b.evolucion ?? null, b.etapa ?? null, b.sprite_url || null, b.grito_url || null,
          b.generacion ?? null, b.prob_aparicion ?? null, b.prob_shiny ?? null]
       );
@@ -473,6 +522,12 @@ pokemon.post("/especies", async (req, res, next) => {
       for (const t of new Set(b.tipos_ataque as number[])) {
         await cliente.query(
           `insert into especie_tipos_ataque (especie_id, tipo_id) values ($1,$2)`, [id, t]);
+      }
+      const errorIniciales = await guardarAtaquesIniciales(
+        cliente, id, b.ataques_iniciales as { ataque_id: string; probabilidad: number }[], b.tipos_ataque as number[]);
+      if (errorIniciales) {
+        await cliente.query("rollback");
+        return res.status(400).json({ causa: errorIniciales });
       }
       await cliente.query("commit");
       await auditar("especie", id, "creacion");
@@ -505,13 +560,13 @@ pokemon.put("/especies/:id", async (req, res, next) => {
       await cliente.query("begin");
       const { rows } = await cliente.query(
         `update especies set dex = $1, nombre = $2, tipo_i = $3, tipo_ii = $4, hp = $5,
-                iniciativa = $6, puntos_evolucion = $7, ataque_inicial_id = $8,
-                preevolucion = $9, evolucion = $10, etapa = $11, sprite_url = $12, grito_url = $13,
-                generacion = $14, prob_aparicion = $15, prob_shiny = $16, activo = $17,
+                iniciativa = $6, puntos_evolucion = $7,
+                preevolucion = $8, evolucion = $9, etapa = $10, sprite_url = $11, grito_url = $12,
+                generacion = $13, prob_aparicion = $14, prob_shiny = $15, activo = $16,
                 version = version + 1, modificado_en = now()
-         where id = $18 and version = $19 returning version`,
+         where id = $17 and version = $18 returning version`,
         [b.dex, b.nombre.trim(), b.tipo_i, b.tipo_ii ?? null, b.hp ?? null, b.iniciativa ?? null,
-         b.puntos_evolucion ?? null, b.ataque_inicial_id ?? null, b.preevolucion ?? null,
+         b.puntos_evolucion ?? null, b.preevolucion ?? null,
          b.evolucion ?? null, b.etapa ?? null, b.sprite_url || null, b.grito_url || null,
          b.generacion ?? null, b.prob_aparicion ?? null, b.prob_shiny ?? null, b.activo, id, b.version]
       );
@@ -530,6 +585,13 @@ pokemon.put("/especies/:id", async (req, res, next) => {
       for (const t of new Set(b.tipos_ataque as number[])) {
         await cliente.query(
           `insert into especie_tipos_ataque (especie_id, tipo_id) values ($1,$2)`, [id, t]);
+      }
+      await cliente.query(`delete from especie_ataques_iniciales where especie_id = $1`, [id]);
+      const errorIniciales = await guardarAtaquesIniciales(
+        cliente, id, b.ataques_iniciales as { ataque_id: string; probabilidad: number }[], b.tipos_ataque as number[]);
+      if (errorIniciales) {
+        await cliente.query("rollback");
+        return res.status(400).json({ causa: errorIniciales });
       }
       await cliente.query("commit");
       await auditar("especie", id, "edicion");
@@ -581,7 +643,15 @@ pokemon.get("/apariciones/elegibles", async (req, res, next) => {
     const { rows: especies } = await pool.query(
       `select e.id, e.dex::float8 as dex, e.nombre::text as nombre, e.tipo_i, e.tipo_ii,
               e.sprite_url, e.grito_url,
-              e.prob_aparicion::float8 as prob_aparicion, e.prob_shiny::float8 as prob_shiny
+              e.prob_aparicion::float8 as prob_aparicion, e.prob_shiny::float8 as prob_shiny,
+              coalesce((select json_agg(json_build_object(
+                          'ataque_id', a.id, 'nombre', a.nombre::text,
+                          'tipo_id', a.tipo_id, 'danio', a.danio,
+                          'probabilidad', ai.probabilidad::float8)
+                        order by ai.ataque_id)
+                        from especie_ataques_iniciales ai
+                        join ataques a on a.id = ai.ataque_id
+                        where ai.especie_id = e.id), '[]') as ataques_iniciales
        from especies e
        where e.activo and e.prob_aparicion > 0
          and exists (select 1 from aparicion_bioma ab

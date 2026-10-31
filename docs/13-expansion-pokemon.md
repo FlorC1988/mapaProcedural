@@ -30,7 +30,7 @@ Quedan fuera de esta propuesta, salvo decisión expresa: combates, entrenadores,
 | G — INICIATIVA | Iniciativa del juego de mesa | 345 |
 | H — PUNTOS EVOLUCION | Puntos de evolución del juego de mesa | 345 |
 | I–L — TIPO COMP 1–4 | Tipos elementales de los ataques que la especie puede usar | 345 |
-| M — ATAQUE INICIAL | Nombre del ataque inicial (referencia a `Atques-JuegoMesa`) | 345 |
+| M — ATAQUE INICIAL | Nombre del ataque inicial (referencia a `Atques-JuegoMesa`); se importa como el único inicial con probabilidad 1 (`DEC-107`) | 345 |
 
 Observaciones sobre los datos:
 
@@ -66,7 +66,7 @@ Especie
 ├── iniciativa (opcional)
 ├── puntos de evolución (opcional)
 ├── tipos de ataque compatibles (1..4 tipos elementales)
-├── ataque inicial (referencia a Ataque, opcional)
+├── ataques iniciales (0..4 referencias a Ataque con probabilidad, `DEC-107`)
 ├── PreEvolucion
 ├── Evolucion
 ├── Etapa (estado evolutivo)
@@ -84,6 +84,7 @@ Reglas aprobadas (`DEC-095`):
 
 - la identidad es el número de dex nacional más la distinción de forma cuando el número es decimal;
 - el nombre es único sin distinguir mayúsculas (mismo criterio que biomas y microbiomas);
+- los ataques iniciales son 0..4 ataques activos cuyo tipo está entre los tipos de ataque compatibles de la especie, cada uno con una probabilidad como peso relativo (0 < p ≤ 1) para el sorteo del encuentro (`DEC-107`);
 - sin eliminación física; la desactivación queda bloqueada cuando la especie es referenciada por dependencias activas (ataque inicial de otras especies, apariciones configuradas o asignaciones existentes, según se detalle al implementar);
 - concurrencia optimista por versión, coherente con `DEC-058`.
 
@@ -127,8 +128,9 @@ El panel de detalle de una celda ofrece el botón "Buscar pokémon". Al pulsarlo
 
 1. se calculan a demanda las especies **activas** elegibles para el bioma de la celda que tienen `prob_aparicion > 0`; las especies sin probabilidad cargada no participan;
 2. se sortea una especie ponderando por `prob_aparicion` (rareza relativa entre las candidatas);
-3. se tira `prob_shiny`: si es nula, la especie nunca sale shiny; si sale, se muestra el sprite shiny de PokéAPI;
-4. el resultado se muestra en un modal con sprite, número de dex, nombre, tipos y grito, y se puede volver a sortear.
+3. se sortea un ataque inicial de la especie, ponderado por su probabilidad como peso relativo (`DEC-107`); si la especie no tiene iniciales, el encuentro simplemente no muestra ataque;
+4. se tira `prob_shiny`: si es nula, la especie nunca sale shiny; si sale, se muestra el sprite shiny de PokéAPI;
+5. el resultado se muestra en un modal con sprite, número de dex, nombre, tipos, ataque inicial sorteado (nombre, tipo y daño) y grito, y se puede volver a sortear.
 
 El encuentro es efímero: no se asigna a la celda, no se persiste, no forma parte del snapshot ni usa la semilla del mapa (`DEC-098`, `DEC-102`). Si el bioma no tiene tipos habilitados o ninguna especie candidata tiene probabilidad, el modal lo informa. Los gimnasios no intervienen mientras `DEC-099` siga pendiente.
 
@@ -167,7 +169,7 @@ Reproducibilidad (`DEC-102`): los datos Pokémon no participan en la semilla, el
 Prefijos: `RF-PKM` (especies), `RF-ATQ` (ataques), `RF-ENC` (aparición), `RF-GYM-P` (gimnasios).
 
 - **RF-PKM-001 — Aprobado:** un administrador podrá crear, consultar, editar, activar y desactivar especies; no podrá eliminarlas físicamente.
-- **RF-PKM-002 — Aprobado:** cada especie tendrá identidad estable, número de dex nacional con decimales permitidos, nombre único sin distinguir mayúsculas de 1 a 100 caracteres, conjunto de categorías (`DEC-104`), tipos elementales, datos de juego opcionales (HP, iniciativa, puntos de evolución), hasta 4 tipos de ataque compatibles, ataque inicial opcional, cadena evolutiva (PreEvolucion, Evolucion, Etapa), Sprite URL, Grito (URL de sonido), Generación (entero de hasta 2 dígitos), probabilidad de aparición, probabilidad shiny, estado y versión de concurrencia.
+- **RF-PKM-002 — Aprobado:** cada especie tendrá identidad estable, número de dex nacional con decimales permitidos, nombre único sin distinguir mayúsculas de 1 a 100 caracteres, conjunto de categorías (`DEC-104`), tipos elementales, datos de juego opcionales (HP, iniciativa, puntos de evolución), hasta 4 tipos de ataque compatibles, ataques iniciales (0..4 con probabilidad, `DEC-107`), cadena evolutiva (PreEvolucion, Evolucion, Etapa), Sprite URL, Grito (URL de sonido), Generación (entero de hasta 2 dígitos), probabilidad de aparición, probabilidad shiny, estado y versión de concurrencia.
 - **RF-PKM-003 — Aprobado:** el listado de especies permitirá búsqueda parcial por nombre, filtros por tipo, categoría (cualquiera del conjunto), generación y estado, y orden.
 - **RF-PKM-006 — Aprobado:** el sistema podrá obtener o completar datos de especie desde PokéAPI (`DEC-103`); los datos así obtenidos quedan sujetos a edición administrativa posterior.
 - **RF-ATQ-001 — Aprobado:** un administrador podrá crear, consultar, editar, activar y desactivar ataques; no podrá eliminarlos físicamente.
@@ -175,7 +177,7 @@ Prefijos: `RF-PKM` (especies), `RF-ATQ` (ataques), `RF-ENC` (aparición), `RF-GY
 - **RF-ATQ-003 — Aprobado:** existirá un catálogo normativo de estados alterados con identidad y nombre único, administrable con las mismas reglas que el resto de catálogos.
 - **RF-ENC-001 — Aprobado:** un administrador podrá administrar qué tipos elementales son elegibles para aparecer en cada bioma, indicando por tipo si la elegibilidad incluye también a las especies que lo tienen como Type II.
 - **RF-ENC-002 — Aprobado:** la consulta de un mapa mostrará, calculado a demanda, el conjunto de especies activas elegibles por cada bioma presente, según el mecanismo de la sección 4 (`DEC-098`); no habrá asignación de especies a celdas.
-- **RF-ENC-003 — Aprobado:** desde el detalle de una celda se podrá solicitar un encuentro aleatorio, que sortea una especie activa elegible para el bioma de la celda con probabilidad de aparición cargada, ponderada por esa probabilidad, con tirada de shiny; el encuentro no se persiste (`DEC-106`).
+- **RF-ENC-003 — Aprobado:** desde el detalle de una celda se podrá solicitar un encuentro aleatorio, que sortea una especie activa elegible para el bioma de la celda con probabilidad de aparición cargada, ponderada por esa probabilidad, con tirada de shiny y sorteo de un ataque inicial ponderado por su probabilidad (`DEC-107`); el encuentro no se persiste (`DEC-106`).
 - **RF-GYM-P-001 — Pendiente:** (según `DEC-099`) cada gimnasio podrá mostrar o recibir especies asociadas a su tipo elemental.
 - **RF-PKM-004 — Aprobado:** las escrituras sobre especies, ataques y apariciones serán atómicas, con concurrencia optimista y registro en auditoría administrativa.
 - **RF-PKM-005 — Aprobado:** los cambios de los catálogos Pokémon no alterarán mapas ni snapshots existentes.

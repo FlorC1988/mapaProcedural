@@ -42,9 +42,10 @@ export default function FichaPokedex({
 
   const nombreTipo = (id: number) => tipos.find((t) => t.id === id)?.nombre ?? String(id);
   const nombreCategoria = (id: string) => categorias.find((c) => c.id === id)?.nombre ?? id;
-  const ataqueInicial = especie.ataque_inicial_id
-    ? ataques.find((a) => a.id === especie.ataque_inicial_id)?.nombre ?? "—"
-    : "—";
+  const nombreAtaque = (id: string) => ataques.find((a) => a.id === id)?.nombre ?? "—";
+  const ataquesIniciales = especie.ataques_iniciales.map(
+    (i) => `${nombreAtaque(i.ataque_id)} (${(i.probabilidad * 100).toFixed(0)}%)`
+  );
 
   function reproducirGrito() {
     if (!especie?.grito_url) return;
@@ -128,7 +129,8 @@ export default function FichaPokedex({
           </div>
         </dl>
         <p>
-          <span className="pokedex-etiqueta">Ataque inicial:</span> {ataqueInicial}
+          <span className="pokedex-etiqueta">Ataques iniciales:</span>{" "}
+          {ataquesIniciales.length === 0 ? "—" : ataquesIniciales.join(", ")}
         </p>
         <p className="pokedex-tipos-ataque">
           <span className="pokedex-etiqueta">Tipos de ataque:</span>{" "}

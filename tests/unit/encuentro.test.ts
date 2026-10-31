@@ -1,11 +1,16 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { sortearEspecie, spriteShiny, tirarShiny } from "../../web/src/pokedex/encuentro.ts";
+import { sortearAtaqueInicial, sortearEspecie, spriteShiny, tirarShiny } from "../../web/src/pokedex/encuentro.ts";
 import { contrasteTexto, formatearDex, formatearPorcentaje } from "../../web/src/pokedex/tipos.ts";
-import type { EspecieElegible } from "../../web/src/api.ts";
+import type { AtaqueInicialElegible, EspecieElegible } from "../../web/src/api.ts";
 
 const esp = (nombre: string, prob_aparicion: number): EspecieElegible => ({
   id: nombre, dex: 1, nombre, tipo_i: 1, tipo_ii: null, sprite_url: null, grito_url: null, prob_aparicion, prob_shiny: null,
+  ataques_iniciales: [],
+});
+
+const atq = (nombre: string, probabilidad: number): AtaqueInicialElegible => ({
+  ataque_id: nombre, nombre, tipo_id: 1, danio: null, probabilidad,
 });
 
 describe("Encuentro (DEC-106)", () => {
@@ -39,6 +44,21 @@ describe("Encuentro (DEC-106)", () => {
     assert.equal(tirarShiny(0.5, () => 0.4), true);
     assert.equal(tirarShiny(0.5, () => 0.5), false);
     assert.equal(tirarShiny(1, () => 0.999), true);
+  });
+
+  it("ataque inicial (DEC-107): vacío o pesos nulos no producen ataque", () => {
+    assert.equal(sortearAtaqueInicial([]), null);
+    assert.equal(sortearAtaqueInicial([atq("A", 0)]), null);
+  });
+
+  it("ataque inicial (DEC-107): el peso es relativo, 1/3 reparte 25/75", () => {
+    const as_ = [atq("A", 1), atq("B", 3)];
+    const c = { A: 0, B: 0 } as Record<string, number>;
+    for (let i = 0; i < 40000; i++) c[sortearAtaqueInicial(as_)!.nombre]++;
+    assert.ok(Math.abs(c.A / 40000 - 0.25) < 0.02, `A=${c.A}`);
+    assert.equal(sortearAtaqueInicial(as_, () => 0)!.nombre, "A");
+    assert.equal(sortearAtaqueInicial(as_, () => 0.24)!.nombre, "A");
+    assert.equal(sortearAtaqueInicial(as_, () => 0.25)!.nombre, "B");
   });
 
   it("URL de sprite shiny de PokéAPI", () => {

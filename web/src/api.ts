@@ -135,6 +135,17 @@ export interface Ataque {
   modificadoEn: string;
 }
 
+export interface AtaqueInicial {
+  ataque_id: string;
+  probabilidad: number;
+}
+
+export interface AtaqueInicialElegible extends AtaqueInicial {
+  nombre: string;
+  tipo_id: number;
+  danio: number | null;
+}
+
 export interface Especie {
   id: string;
   dex: number;
@@ -144,7 +155,7 @@ export interface Especie {
   hp: number | null;
   iniciativa: number | null;
   puntos_evolucion: number | null;
-  ataque_inicial_id: string | null;
+  ataques_iniciales: AtaqueInicial[];
   preevolucion: string | null;
   evolucion: string | null;
   etapa: string | null;
@@ -177,6 +188,7 @@ export interface EspecieElegible {
   grito_url: string | null;
   prob_aparicion: number;
   prob_shiny: number | null;
+  ataques_iniciales: AtaqueInicialElegible[];
 }
 
 export interface RespuestaElegibles {

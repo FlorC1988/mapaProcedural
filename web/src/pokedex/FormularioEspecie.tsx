@@ -19,7 +19,7 @@ interface FormEspecie {
   hp: string;
   iniciativa: string;
   puntos_evolucion: string;
-  ataque_inicial_id: string;
+  ataques_iniciales: { ataque_id: string; probabilidad: string }[];
   preevolucion: string;
   evolucion: string;
   etapa: string;
@@ -50,7 +50,7 @@ function formInicial(especie: Especie | "nuevo", tipoPorDefecto: number): FormEs
       hp: "",
       iniciativa: "",
       puntos_evolucion: "",
-      ataque_inicial_id: "",
+      ataques_iniciales: [],
       preevolucion: "",
       evolucion: "",
       etapa: "",
@@ -72,7 +72,10 @@ function formInicial(especie: Especie | "nuevo", tipoPorDefecto: number): FormEs
     hp: numOVacio(e.hp),
     iniciativa: numOVacio(e.iniciativa),
     puntos_evolucion: numOVacio(e.puntos_evolucion),
-    ataque_inicial_id: e.ataque_inicial_id ?? "",
+    ataques_iniciales: e.ataques_iniciales.map((i) => ({
+      ataque_id: i.ataque_id,
+      probabilidad: porcentajeOVacio(i.probabilidad),
+    })),
     preevolucion: e.preevolucion ?? "",
     evolucion: e.evolucion ?? "",
     etapa: e.etapa ?? "",
@@ -107,6 +110,8 @@ export default function FormularioEspecie({
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [spriteRoto, setSpriteRoto] = useState(false);
+  const [tipoInicial, setTipoInicial] = useState<number | "">("");
+  const [ataqueSel, setAtaqueSel] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   async function guardar() {
@@ -120,7 +125,10 @@ export default function FormularioEspecie({
       hp: num(form.hp),
       iniciativa: num(form.iniciativa),
       puntos_evolucion: num(form.puntos_evolucion),
-      ataque_inicial_id: form.ataque_inicial_id || null,
+      ataques_iniciales: form.ataques_iniciales.map((i) => ({
+        ataque_id: i.ataque_id,
+        probabilidad: porcentaje(i.probabilidad) ?? 0,
+      })),
       preevolucion: form.preevolucion || null,
       evolucion: form.evolucion || null,
       etapa: form.etapa || null,
@@ -179,6 +187,17 @@ export default function FormularioEspecie({
   );
 
   const nombreTipo = (id: number) => tipos.find((t) => t.id === id)?.nombre ?? String(id);
+  const nombreAtaque = (id: string) => ataques.find((a) => a.id === id)?.nombre ?? "—";
+  const tipoDeAtaque = (id: string) => ataques.find((a) => a.id === id)?.tipo_id;
+
+  function agregarInicial() {
+    if (!ataqueSel || form.ataques_iniciales.length >= 4) return;
+    setForm({
+      ...form,
+      ataques_iniciales: [...form.ataques_iniciales, { ataque_id: ataqueSel, probabilidad: "100" }],
+    });
+    setAtaqueSel("");
+  }
   const dexNum = Number(form.dex);
   const titulo = especie === "nuevo" ? "Nueva especie" : `Editar ${especie.nombre}`;
 
@@ -283,17 +302,6 @@ export default function FormularioEspecie({
             {campoNumero("hp", "HP", 0, 99)}
             {campoNumero("iniciativa", "Iniciativa", 0, 99)}
             {campoNumero("puntos_evolucion", "Puntos evolución", 0, 99)}
-            <label className="ancho-completo">
-              Ataque inicial
-              <select value={form.ataque_inicial_id} onChange={(e) => setForm({ ...form, ataque_inicial_id: e.target.value })}>
-                <option value="">Ninguno</option>
-                {ataques.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.nombre}
-                  </option>
-                ))}
-              </select>
-            </label>
           </fieldset>
 
           <fieldset className="pokedex-campos">
@@ -306,7 +314,17 @@ export default function FormularioEspecie({
                     checked={form.tipos_ataque.has(t.id)}
                     onChange={() =>
                       alternar(form.tipos_ataque, t.id, (s) => {
-                        if (s.size <= 4) setForm({ ...form, tipos_ataque: s });
+                        if (s.size <= 4) {
+                          // DEC-107: los iniciales deben ser de tipos compatibles;
+                          // al destildar un tipo se quitan sus iniciales.
+                          setForm({
+                            ...form,
+                            tipos_ataque: s,
+                            ataques_iniciales: form.ataques_iniciales.filter((i) =>
+                              s.has(tipoDeAtaque(i.ataque_id) ?? -1)),
+                          });
+                          if (!s.has(Number(tipoInicial))) setTipoInicial("");
+                        }
                       })
                     }
                   />
@@ -314,6 +332,94 @@ export default function FormularioEspecie({
                 </label>
               ))}
             </div>
+          </fieldset>
+
+          <fieldset className="pokedex-campos">
+            <legend>Ataques iniciales (máx. 4)</legend>
+            {form.ataques_iniciales.map((ini) => (
+              <div className="ancho-completo pokedex-inicial" key={ini.ataque_id}>
+                <span className="pokedex-inicial-nombre">
+                  {nombreAtaque(ini.ataque_id)}
+                  {tipoDeAtaque(ini.ataque_id) != null && (
+                    <BadgeTipo id={tipoDeAtaque(ini.ataque_id)!} nombre={nombreTipo(tipoDeAtaque(ini.ataque_id)!)} />
+                  )}
+                </span>
+                <label className="pokedex-inicial-prob">
+                  %
+                  <input
+                    type="number"
+                    min={0.1}
+                    max={100}
+                    step="0.1"
+                    value={ini.probabilidad}
+                    aria-label={`Probabilidad de ${nombreAtaque(ini.ataque_id)}`}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        ataques_iniciales: form.ataques_iniciales.map((x) =>
+                          x.ataque_id === ini.ataque_id ? { ...x, probabilidad: e.target.value } : x),
+                      })
+                    }
+                  />
+                </label>
+                <button
+                  type="button"
+                  aria-label={`Quitar ${nombreAtaque(ini.ataque_id)}`}
+                  onClick={() =>
+                    setForm({
+                      ...form,
+                      ataques_iniciales: form.ataques_iniciales.filter((x) => x.ataque_id !== ini.ataque_id),
+                    })
+                  }
+                >
+                  Quitar
+                </button>
+              </div>
+            ))}
+            {form.tipos_ataque.size === 0 ? (
+              <p className="ayuda ancho-completo">Marcá tipos de ataque compatibles para elegir iniciales.</p>
+            ) : form.ataques_iniciales.length >= 4 ? (
+              <p className="ayuda ancho-completo">Ya hay 4 ataques iniciales; quitá alguno para agregar otro.</p>
+            ) : (
+              <div className="ancho-completo pokedex-inicial-agregar">
+                <label>
+                  Tipo
+                  <select
+                    value={tipoInicial}
+                    onChange={(e) => {
+                      setTipoInicial(e.target.value === "" ? "" : Number(e.target.value));
+                      setAtaqueSel("");
+                    }}
+                  >
+                    <option value="">Elegir tipo</option>
+                    {[...form.tipos_ataque].map((tid) => (
+                      <option key={tid} value={tid}>
+                        {nombreTipo(tid)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Ataque
+                  <select value={ataqueSel} disabled={tipoInicial === ""} onChange={(e) => setAtaqueSel(e.target.value)}>
+                    <option value="">Elegir ataque</option>
+                    {ataques
+                      .filter(
+                        (a) => a.activo && a.tipo_id === tipoInicial &&
+                          !form.ataques_iniciales.some((i) => i.ataque_id === a.id)
+                      )
+                      .map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.nombre}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <button type="button" disabled={!ataqueSel} onClick={agregarInicial}>
+                  Agregar
+                </button>
+              </div>
+            )}
           </fieldset>
 
           <fieldset className="pokedex-campos">

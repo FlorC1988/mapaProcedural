@@ -39,3 +39,6 @@ Thumbs.db
 
 # Supabase auth signing keys (explicitly warned in config.toml)
 signing_keys.json
+
+# Backup local de imágenes Docker (supera el límite de 100 MB de GitHub)
+docker-images.tar

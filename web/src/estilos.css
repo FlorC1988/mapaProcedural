@@ -1116,6 +1116,36 @@ label.check {
   align-items: flex-end;
 }
 
+.pokedex-inicial,
+.pokedex-inicial-agregar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.pokedex-inicial-nombre {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  min-width: 10rem;
+}
+
+.pokedex-inicial-prob {
+  max-width: 6rem;
+}
+
+.pokedex-inicial-prob input {
+  width: 5rem;
+}
+
+.pokedex-inicial-agregar label {
+  flex: 1;
+  min-width: 8rem;
+}
+
 .pokedex-fila-audio label {
   flex: 1;
 }

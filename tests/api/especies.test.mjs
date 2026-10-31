@@ -14,7 +14,7 @@ const especiePorId = async (id) => (await get(`/api/especies/${id}`)).body;
 async function crearEspecie(extra = {}) {
   const datos = {
     dex: nuevoDex(), nombre: nombre("Especie"), tipo_i: 17, tipo_ii: null, hp: 10, iniciativa: 2, puntos_evolucion: 1,
-    ataque_inicial_id: null, preevolucion: null, evolucion: null, etapa: "Etapa I", sprite_url: null, grito_url: null,
+    ataques_iniciales: [], preevolucion: null, evolucion: null, etapa: "Etapa I", sprite_url: null, grito_url: null,
     generacion: 9, prob_aparicion: 0.25, prob_shiny: 0.01, categorias: [], tipos_ataque: [17], ...extra,
   };
   const r = await post("/api/especies", datos);
@@ -111,11 +111,87 @@ describe("Especies (RF-PKM-001..004)", () => {
       const a = (await get(`/api/ataques?q=${encodeURIComponent(n)}`)).body[0];
       if (a?.activo) await put(`/api/ataques/${a.id}`, { ...a, activo: false });
     });
-    await crearEspecie({ ataque_inicial_id: atq.body.id });
+    await crearEspecie({ ataques_iniciales: [{ ataque_id: atq.body.id, probabilidad: 1 }] });
     const a = (await get(`/api/ataques?q=${encodeURIComponent(n)}`)).body[0];
     const r = await put(`/api/ataques/${a.id}`, { ...a, activo: false });
     assert.equal(r.status, 409);
     assert.equal(r.body.causa, "ataque_en_uso");
+  });
+
+  it("ataques iniciales múltiples (DEC-107): se guardan con probabilidad y se devuelven", async () => {
+    const mk = async () => {
+      const n = nombre("Atq ini");
+      const r = await post("/api/ataques", { nombre: n, tipo_id: 17, descripcion: "", danio: 1, estados_objetivo: [], estados_auto: [] });
+      assert.equal(r.status, 201);
+      alFinal(async () => {
+        const a = (await get(`/api/ataques?q=${encodeURIComponent(n)}`)).body[0];
+        if (a?.activo) await put(`/api/ataques/${a.id}`, { ...a, activo: false });
+      });
+      return r.body.id;
+    };
+    const a1 = await mk();
+    const a2 = await mk();
+    const { r } = await crearEspecie({
+      ataques_iniciales: [
+        { ataque_id: a1, probabilidad: 0.25 },
+        { ataque_id: a2, probabilidad: 0.75 },
+      ],
+    });
+    assert.equal(r.status, 201, JSON.stringify(r.body));
+    const e = await especiePorId(r.body.id);
+    assert.deepEqual(
+      e.ataques_iniciales.map((i) => [i.ataque_id, i.probabilidad]).sort(),
+      [[a1, 0.25], [a2, 0.75]].sort()
+    );
+
+    // Edición: reemplaza la lista completa dentro de la transacción.
+    const edit = await put(`/api/especies/${e.id}`, {
+      ...e, ataques_iniciales: [{ ataque_id: a2, probabilidad: 1 }],
+    });
+    assert.equal(edit.status, 200, JSON.stringify(edit.body));
+    const e2 = await especiePorId(e.id);
+    assert.deepEqual(e2.ataques_iniciales, [{ ataque_id: a2, probabilidad: 1 }]);
+  });
+
+  it("ataques iniciales (DEC-107): validaciones y atomicidad", async () => {
+    const atq17 = await post("/api/ataques", {
+      nombre: nombre("Atq ini 17"), tipo_id: 17, descripcion: "", danio: 1, estados_objetivo: [], estados_auto: [],
+    });
+    const atq12 = await post("/api/ataques", {
+      nombre: nombre("Atq ini 12"), tipo_id: 12, descripcion: "", danio: 1, estados_objetivo: [], estados_auto: [],
+    });
+    for (const id of [atq17.body.id, atq12.body.id]) {
+      alFinal(async () => {
+        const a = (await get(`/api/ataques?estado=`)).body.find((x) => x.id === id);
+        if (a?.activo) await put(`/api/ataques/${a.id}`, { ...a, activo: false });
+      });
+    }
+    const ini = (id) => [{ ataque_id: id, probabilidad: 1 }];
+    const fantasma = "00000000-0000-0000-0000-000000000000";
+
+    // Tipo no compatible con tipos_ataque ([17] por defecto).
+    let r = (await crearEspecie({ ataques_iniciales: ini(atq12.body.id) })).r;
+    assert.equal(r.status, 400);
+    assert.equal(r.body.causa, "tipo_ataque_incompatible");
+
+    // Ataque inexistente: 400 y la especie NO queda creada.
+    const nombreFantasma = nombre("Esp atq fantasma");
+    r = (await crearEspecie({ nombre: nombreFantasma, ataques_iniciales: ini(fantasma) })).r;
+    assert.equal(r.status, 400);
+    assert.equal(r.body.causa, "referencia_invalida");
+    const lista = (await get(`/api/especies?q=${encodeURIComponent(nombreFantasma)}`)).body;
+    assert.equal(lista.length, 0, "el alta debió revertirse");
+
+    // Estructura: más de 4, duplicados, probabilidad fuera de rango.
+    const cinco = [...ini(atq17.body.id), ...ini(atq12.body.id), ...ini(fantasma), ...ini(atq17.body.id)];
+    r = (await crearEspecie({ tipos_ataque: [17], ataques_iniciales: cinco })).r;
+    assert.equal(r.status, 400);
+    r = (await crearEspecie({ ataques_iniciales: [...ini(atq17.body.id), ...ini(atq17.body.id)] })).r;
+    assert.equal(r.status, 400);
+    r = (await crearEspecie({ ataques_iniciales: [{ ataque_id: atq17.body.id, probabilidad: 0 }] })).r;
+    assert.equal(r.status, 400);
+    r = (await crearEspecie({ ataques_iniciales: [{ ataque_id: atq17.body.id, probabilidad: 1.5 }] })).r;
+    assert.equal(r.status, 400);
   });
 
   it("concurrencia optimista y 404", async () => {

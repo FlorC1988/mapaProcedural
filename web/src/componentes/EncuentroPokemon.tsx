@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { api, ErrorApi, type EspecieElegible, type RespuestaElegibles } from "../api";
+import { api, ErrorApi, type AtaqueInicialElegible, type EspecieElegible, type RespuestaElegibles } from "../api";
 import Modal from "./Modal";
 import BadgeTipo from "../pokedex/BadgeTipo";
 import { formatearDex } from "../pokedex/tipos";
-import { sortearEspecie, spriteShiny, tirarShiny } from "../pokedex/encuentro";
+import { sortearAtaqueInicial, sortearEspecie, spriteShiny, tirarShiny } from "../pokedex/encuentro";
 
 interface Encuentro {
   especie: EspecieElegible;
+  ataque: AtaqueInicialElegible | null;
   shiny: boolean;
 }
 
@@ -33,7 +34,9 @@ export default function EncuentroPokemon({
     audioRef.current?.pause();
     audioRef.current = null;
     const especie = sortearEspecie(d.especies);
-    setEncuentro(especie ? { especie, shiny: tirarShiny(especie.prob_shiny) } : null);
+    setEncuentro(especie
+      ? { especie, ataque: sortearAtaqueInicial(especie.ataques_iniciales), shiny: tirarShiny(especie.prob_shiny) }
+      : null);
   }
 
   async function buscar() {
@@ -106,6 +109,13 @@ export default function EncuentroPokemon({
               <BadgeTipo id={e.tipo_i} nombre={nombreTipo(e.tipo_i)} />
               {e.tipo_ii != null && <BadgeTipo id={e.tipo_ii} nombre={nombreTipo(e.tipo_ii)} />}
             </div>
+            {encuentro.ataque && (
+              <p className="encuentro-ataque">
+                <span className="pokedex-etiqueta">Ataque inicial:</span> {encuentro.ataque.nombre}
+                <BadgeTipo id={encuentro.ataque.tipo_id} nombre={nombreTipo(encuentro.ataque.tipo_id)} />
+                {encuentro.ataque.danio != null && <span className="encuentro-danio"> {encuentro.ataque.danio} daño</span>}
+              </p>
+            )}
           </div>
         )}
         <div className="acciones">

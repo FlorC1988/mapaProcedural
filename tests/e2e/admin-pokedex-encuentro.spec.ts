@@ -17,7 +17,7 @@ async function crearEstado() {
 async function crearEspecie(extra: Record<string, unknown> = {}) {
   const datos = {
     dex: Number((97000 + (Date.now() % 2000) + Math.random()).toFixed(2)), nombre: nombre("Especie E2E"),
-    tipo_i: 17, tipo_ii: null, hp: null, iniciativa: null, puntos_evolucion: null, ataque_inicial_id: null,
+    tipo_i: 17, tipo_ii: null, hp: null, iniciativa: null, puntos_evolucion: null, ataques_iniciales: [],
     preevolucion: null, evolucion: null, etapa: null, sprite_url: null, grito_url: null, generacion: null,
     prob_aparicion: 1, prob_shiny: null, categorias: [], tipos_ataque: [], ...extra,
   };
@@ -72,10 +72,18 @@ test("Pokédex: buscar una especie y activarla/desactivarla desde la ficha (regr
   await expect(page.locator(".pokedex-ficha .pokedex-estado")).toHaveText("Activa");
 });
 
-test("DEC-106: buscar pokémon en una celda del bioma configurado muestra una especie de ese tipo", async ({ page }) => {
+test("DEC-106/DEC-107: buscar pokémon en una celda del bioma configurado muestra una especie de ese tipo con su ataque inicial", async ({ page }) => {
+  const nAtq = nombre("Atq encuentro");
+  const atq = await post("/api/ataques", { nombre: nAtq, tipo_id: 17, descripcion: "", danio: 3, estados_objetivo: [], estados_auto: [] });
+  expect(atq.status).toBe(201);
+  alFinal(async () => {
+    const a = (await get(`/api/ataques?q=${encodeURIComponent(nAtq)}`)).body[0];
+    if (a?.activo) await put(`/api/ataques/${a.id}`, { ...a, activo: false });
+  });
+
   const conTipos = await crearBiomaPrueba();
   const sinTipos = await crearBiomaPrueba();
-  await crearEspecie();
+  await crearEspecie({ tipos_ataque: [17], ataques_iniciales: [{ ataque_id: atq.body.id, probabilidad: 1 }] });
   expect((await put(`/api/apariciones/${conTipos}`, { tipos: [{ tipo_id: 17, incluyeTipoII: false }] })).status).toBe(200);
   const biomas = (await get("/api/biomas")).body;
   const nombreCon = biomas.find((b) => b.id === conTipos).nombre;
@@ -99,6 +107,8 @@ test("DEC-106: buscar pokémon en una celda del bioma configurado muestra una es
   const modal = page.getByRole("dialog", { name: `Encuentro en ${nombreCon}` });
   await expect(modal.locator(".encuentro-nombre")).toBeVisible();
   await expect(modal.locator(".badge-tipo").first()).toHaveText(/veneno/i);
+  await expect(modal.locator(".encuentro-ataque")).toContainText(nAtq);
+  await expect(modal.locator(".encuentro-ataque")).toContainText("3 daño");
   await modal.getByRole("button", { name: "Buscar otro" }).click();
   await expect(modal.locator(".encuentro-nombre")).toBeVisible();
   await modal.getByRole("button", { name: "Cerrar" }).click();

@@ -154,8 +154,8 @@ try {
 
     const r = await client.query(
       `insert into public.especies
-         (dex, nombre, tipo_i, tipo_ii, hp, iniciativa, puntos_evolucion, ataque_inicial_id, activo)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`,
+         (dex, nombre, tipo_i, tipo_ii, hp, iniciativa, puntos_evolucion, activo)
+       values ($1,$2,$3,$4,$5,$6,$7,$8) returning id`,
       [
         dex,
         nombre,
@@ -164,12 +164,18 @@ try {
         num(f[5]),
         num(f[6]),
         num(f[7]),
-        atqId,
         datosJuego,
       ],
     );
     const especieId = r.rows[0].id;
     if (datosJuego) activas++;
+
+    if (atqId) {
+      await client.query(
+        "insert into public.especie_ataques_iniciales (especie_id, ataque_id, probabilidad) values ($1,$2,1)",
+        [especieId, atqId],
+      );
+    }
 
     for (const c of norm(f[2]).split(",")) {
       const v = norm(c).toLowerCase();

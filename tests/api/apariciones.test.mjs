@@ -11,7 +11,7 @@ const VENENO = 17, PLANTA = 12;
 async function especie(extra) {
   const datos = {
     dex: Number((BASE_DEX + 0.01 * ++n).toFixed(2)), nombre: nombre("Esp aparición"), tipo_i: VENENO, tipo_ii: null,
-    hp: null, iniciativa: null, puntos_evolucion: null, ataque_inicial_id: null, preevolucion: null, evolucion: null,
+    hp: null, iniciativa: null, puntos_evolucion: null, ataques_iniciales: [], preevolucion: null, evolucion: null,
     etapa: null, sprite_url: null, grito_url: null, generacion: null, prob_aparicion: 0.5, prob_shiny: null,
     categorias: [], tipos_ataque: [], ...extra,
   };
@@ -57,6 +57,7 @@ describe("Aparición por bioma (RF-ENC-001) y elegibles (DEC-106)", () => {
     const e = r.especies.find((x) => x.id === soloI);
     assert.equal(typeof e.dex, "number");
     assert.equal(e.prob_aparicion, 0.5);
+    assert.deepEqual(e.ataques_iniciales, [], "DEC-107: incluye los iniciales (vacíos acá)");
   });
 
   it("con incluyeTipoII también entra la especie Planta/Veneno", async () => {
