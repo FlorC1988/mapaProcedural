@@ -647,6 +647,7 @@ pokemon.get("/apariciones/elegibles", async (req, res, next) => {
               coalesce((select json_agg(json_build_object(
                           'ataque_id', a.id, 'nombre', a.nombre::text,
                           'tipo_id', a.tipo_id, 'danio', a.danio,
+                          'descripcion', a.descripcion,
                           'probabilidad', ai.probabilidad::float8)
                         order by ai.ataque_id)
                         from especie_ataques_iniciales ai

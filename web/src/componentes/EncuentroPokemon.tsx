@@ -138,11 +138,14 @@ export default function EncuentroPokemon({
                 </div>
               </div>
               {encuentro.ataque && (
-                <p className="encuentro-ataque">
-                  <span className="pokedex-etiqueta">Ataque inicial:</span> {encuentro.ataque.nombre}
-                  <BadgeTipo id={encuentro.ataque.tipo_id} nombre={nombreTipo(encuentro.ataque.tipo_id)} />
-                  {encuentro.ataque.danio != null && <span className="encuentro-danio"> {encuentro.ataque.danio} daño</span>}
-                </p>
+                <div className="encuentro-ataque">
+                  <p className="encuentro-ataque-linea">
+                    <strong>{encuentro.ataque.nombre}</strong>
+                    <BadgeTipo id={encuentro.ataque.tipo_id} nombre={nombreTipo(encuentro.ataque.tipo_id)} />
+                    {encuentro.ataque.danio != null && <span className="encuentro-danio"> {encuentro.ataque.danio} daño</span>}
+                  </p>
+                  {encuentro.ataque.descripcion && <p className="encuentro-ataque-desc">{encuentro.ataque.descripcion}</p>}
+                </div>
               )}
             </>
           )}

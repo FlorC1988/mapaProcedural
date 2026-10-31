@@ -900,6 +900,24 @@ label.check {
   background: #b45309;
 }
 
+.encuentro-ataque {
+  margin: 0;
+}
+
+.encuentro-ataque-linea {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.encuentro-ataque-desc {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #52525b;
+}
+
 .modal-encuentro .acciones {
   display: flex;
   justify-content: center;

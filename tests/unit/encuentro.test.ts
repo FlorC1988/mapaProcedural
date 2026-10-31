@@ -10,7 +10,7 @@ const esp = (nombre: string, prob_aparicion: number): EspecieElegible => ({
 });
 
 const atq = (nombre: string, probabilidad: number): AtaqueInicialElegible => ({
-  ataque_id: nombre, nombre, tipo_id: 1, danio: null, probabilidad,
+  ataque_id: nombre, nombre, tipo_id: 1, danio: null, descripcion: "", probabilidad,
 });
 
 describe("Encuentro (DEC-106)", () => {

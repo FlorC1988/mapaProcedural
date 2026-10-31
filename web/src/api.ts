@@ -144,6 +144,7 @@ export interface AtaqueInicialElegible extends AtaqueInicial {
   nombre: string;
   tipo_id: number;
   danio: number | null;
+  descripcion: string;
 }
 
 export interface Especie {
