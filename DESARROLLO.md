@@ -39,6 +39,11 @@ npm run db:reset       # recrea la DB y reaplica migraciones + semilla
 supabase migration new <nombre>   # nueva migración imperativa
 ```
 
+## Arranque y logs
+
+- `iniciar.cmd` (doble clic) o `iniciar.ps1`: levanta Docker, Supabase, backend y frontend. La app queda **desacoplada de la ventana**: cerrarla no detiene nada. `detener.cmd` / `detener.ps1` detiene backend y frontend.
+- `npm run dev` ejecuta `scripts/dev.mjs`: levanta ambos procesos, **anexa** la salida a `logs/dev.log` con timestamp, marca el inicio/fin de cada sesión y registra el código/señal de salida de cada proceso (`proceso terminado: código=X señal=Y`). Si el log se corta de golpe sin línea de cierre, la app fue matada desde afuera (reinicio de Docker/Windows/terminal), no por crash propio.
+
 ## Pruebas
 
 Requisitos: backend y Supabase corriendo (`npm run dev`). La primera vez, instalar el navegador de Playwright con `npx playwright install chromium`.

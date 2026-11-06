@@ -1,7 +1,8 @@
 # Inicia la aplicacion en local: Docker Desktop, base de datos (Supabase), backend y frontend.
 # Uso: .\iniciar.ps1   (o doble clic en iniciar.cmd)
-# Al final muestra la URL de acceso y espera Enter; al pulsarlo detiene backend y
-# frontend. La base queda corriendo (npm run db:stop para detenerla).
+# La app queda corriendo DESACOPLADA de esta ventana: cerrarla no detiene nada.
+# Para detener backend y frontend usar detener.cmd / detener.ps1.
+# La base queda corriendo (npm run db:stop para detenerla).
 
 # Los comandos externos se verifican con $LASTEXITCODE; "Stop" haria fallar en
 # PowerShell 5 cualquier aviso que escriban por stderr (p. ej. supabase status).
@@ -105,15 +106,10 @@ foreach ($puerto in 3000, 5173) {
 }
 
 Paso "Iniciando backend y frontend"
-# Se ejecutan en segundo plano con los logs en un archivo, para que el mensaje
-# final con la URL no quede tapado por la salida de Vite y del servidor.
-New-Item -ItemType Directory -Force "logs" | Out-Null
+# Se ejecutan en segundo plano; npm run dev (scripts/dev.mjs) escribe la salida
+# de ambos procesos en logs\dev.log con timestamp y motivo de cierre.
 $log = Join-Path $PSScriptRoot "logs\dev.log"
-$dev = Start-Process cmd.exe -ArgumentList "/c npm run dev > `"$log`" 2>&1" -WindowStyle Hidden -PassThru
-
-function Detener-App {
-  if ($dev -and -not $dev.HasExited) { taskkill /PID $dev.Id /T /F *> $null }
-}
+$dev = Start-Process cmd.exe -ArgumentList "/c npm run dev > NUL 2>&1" -WindowStyle Hidden -PassThru
 
 try {
   $listo = $false
@@ -147,9 +143,12 @@ try {
   Write-Host " Desde este equipo: http://localhost:5173" -ForegroundColor Green
   Write-Host "============================================================" -ForegroundColor Green
   Write-Host "Supabase Studio: http://127.0.0.1:54323 | Logs: $log"
+  Write-Host " La app queda corriendo en segundo plano. Para detenerla: detener.cmd" -ForegroundColor Green
   Write-Host ""
-  Read-Host "Presiona Enter para detener la aplicacion y cerrar" | Out-Null
 } finally {
-  Detener-App
+  if ($LASTEXITCODE -ne 0 -and -not $listo) {
+    # Arranque fallido: limpiar lo que haya quedado levantado.
+    if ($dev -and -not $dev.HasExited) { taskkill /PID $dev.Id /T /F *> $null }
+  }
 }
-Write-Host "Aplicacion detenida. La base de datos sigue corriendo (npm run db:stop para detenerla)."
+Write-Host "Backend y frontend corriendo en segundo plano. Para detenerlos: detener.cmd"
